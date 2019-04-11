@@ -1,0 +1,44 @@
+package com.rxliuli.rxeasyexcel.domain;
+
+
+import com.rxliuli.rxeasyexcel.domain.convert.DefaultConverter;
+import com.rxliuli.rxeasyexcel.domain.convert.IConverter;
+
+/**
+ * excel header的封装
+ *
+ * @author Quding Ding
+ * @since 2018/6/27
+ */
+public class ExcelWriterHeader {
+  /**
+   * header展示名称
+   */
+  private String name;
+  /**
+   * 对应转换器
+   */
+  private IConverter<Object> convert;
+
+  private ExcelWriterHeader(String name, IConverter<Object> convert) {
+    this.name = name;
+    this.convert = convert;
+  }
+
+  public static ExcelWriterHeader create(String name) {
+    return new ExcelWriterHeader(name, new DefaultConverter());
+  }
+
+  public static ExcelWriterHeader create(String name, IConverter<Object> convert) {
+    return new ExcelWriterHeader(name, convert);
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public IConverter<Object> getConvert() {
+    return convert;
+  }
+
+}
