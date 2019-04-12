@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>com.rxliuli</groupId>
     <artifactId>rx-easy-excel</artifactId>
     <version>1.0-SNAPSHOT</version>
-
     <developers>
         <developer>
             <name>rxliuli</name>
             <email>rxliuli@gmail.com</email>
         </developer>
     </developers>
+    <scm>
+        <connection>scm:git:https://github.com/rxliuli/rx-easy-excel.git</connection>
+        <url>https://github.com/rxliuli/rx-easy-excel</url>
+        <developerConnection>scm:git:git@github.com:rxliuli/rx-easy-excel.git</developerConnection>
+    </scm>
 
     <properties>
         <poi.version>3.17</poi.version>
@@ -26,7 +30,6 @@
         <!-- 设置 github 服务器使用的配置，在 ~/.m2/settings.xml 中定义 -->
         <github.global.server>github</github.global.server>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -49,7 +52,6 @@
             <version>${javax.servlet-api.version}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
@@ -69,16 +71,12 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <repositories>
         <repository>
             <id>rx-easy-test-spring-boot-starter</id>
-            <url>
-                https://raw.githubusercontent.com/rxliuli/rx-easy-test-spring-boot-starter/mvn-repo/
-            </url>
+            <url>https://raw.githubusercontent.com/rxliuli/rx-easy-test-spring-boot-starter/mvn-repo/</url>
         </repository>
     </repositories>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -103,55 +101,10 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.1</version>
-                <configuration>
-                    <!--设置部署目录-->
-                    <altDeploymentRepository>
-                        internal.repo::default::file://${project.build.directory}/mvn-repo
-                    </altDeploymentRepository>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.github.github</groupId>
-                <artifactId>site-maven-plugin</artifactId>
-                <!--
-                  这里需要使用 0.12, 0.9 部署时会出错，具体查看
-                  https://github.com/github/maven-plugins/issues/105
-                -->
-                <version>0.12</version>
-                <configuration>
-                    <!--git 提交的消息-->
-                    <message>Maven artifacts for ${project.version}</message>
-                    <!--禁用网页处理-->
-                    <noJekyll>true</noJekyll>
-                    <!--部署的目录，这里是和上面的 maven-deploy-plugin 的 configuration.altDeploymentRepository 对应-->
-                    <outputDirectory>${project.build.directory}/mvn-repo
-                    </outputDirectory> <!-- matches distribution management repository url above -->
-                    <!--远程分支名-->
-                    <branch>refs/heads/mvn-repo</branch>
-                    <includes>
-                        <include>**/*</include>
-                    </includes>
-                    <!--github 仓库的名字-->
-                    <repositoryName>easy-excel</repositoryName>
-                    <!--github 用户名-->
-                    <repositoryOwner>rxliuli</repositoryOwner>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <!--suppress MybatisMapperXmlInspection -->
-                            <goal>site</goal>
-                        </goals>
-                        <phase>deploy</phase>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+    <distributionManagement>
+        <repository>
+            <id>bintray</id>
+            <url>https://api.bintray.com/maven/rxliuli/maven-repo/rx-easy-excel/;publish=1</url>
+        </repository>
+    </distributionManagement>
 </project>
