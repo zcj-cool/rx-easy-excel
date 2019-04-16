@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.rxliuli</groupId>
     <artifactId>rx-easy-excel</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>jar</packaging>
     <developers>
         <developer>
@@ -27,6 +27,7 @@
         <logback-core.version>1.2.3</logback-core.version>
         <lombok.version>1.16.18</lombok.version>
         <rx-easy-test-spring-boot-starter.version>0.0.3</rx-easy-test-spring-boot-starter.version>
+        <charset.UTF8>UTF-8</charset.UTF8>
     </properties>
     <dependencies>
         <dependency>
@@ -57,12 +58,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.rxliuli</groupId>
             <artifactId>rx-easy-test-spring-boot-starter</artifactId>
             <version>${rx-easy-test-spring-boot-starter.version}</version>
@@ -71,8 +66,8 @@
     </dependencies>
     <repositories>
         <repository>
-            <id>rx-easy-test-spring-boot-starter</id>
-            <url>https://raw.githubusercontent.com/rxliuli/rx-easy-test-spring-boot-starter/mvn-repo/</url>
+            <id>rxliuli/maven-repo</id>
+            <url>https://dl.bintray.com/rxliuli/maven-repo</url>
         </repository>
     </repositories>
     <dependencyManagement>
@@ -105,4 +100,45 @@
             <url>https://api.bintray.com/maven/rxliuli/maven-repo/rx-easy-excel/;publish=1</url>
         </repository>
     </distributionManagement>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>rx-easy-test-spring-boot-starter-sources</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.1</version>
+                <configuration>
+                    <encoding>${charset.UTF8}</encoding>
+                    <charset>${charset.UTF8}</charset>
+                    <docencoding>${charset.UTF8}</docencoding>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>rx-easy-test-spring-boot-starter-javadocs</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <!--跳过 docs-lint-->
+                            <additionalOptions>-Xdoclint:none</additionalOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
