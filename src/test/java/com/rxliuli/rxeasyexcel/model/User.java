@@ -13,17 +13,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
-  @ExcelField
-  private String username;
-  @ExcelField
-  private String passwd;
+    @ExcelField
+    private String username;
+    @ExcelField
+    private String passwd;
 
 
-  @Override
-  public String toString() {
-    return "User{" +
-        "username='" + username + '\'' +
-        ", passwd='" + passwd + '\'' +
-        '}';
-  }
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", passwd='" + passwd + '\'' +
+                '}';
+    }
 }

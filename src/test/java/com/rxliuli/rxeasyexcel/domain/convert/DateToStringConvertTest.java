@@ -8,14 +8,14 @@ import java.util.Date;
 
 public class DateToStringConvertTest {
 
-  @Test
-  public void apply() throws ParseException {
-    Date now = new Date();
-    DateConverter convert = new DateConverter();
+    @Test
+    public void apply() throws ParseException {
+        Date now = new Date();
+        DateConverter convert = new DateConverter();
 
-    String apply = convert.to(now);
-    Date parse = convert.from(apply);
-    Assert.assertEquals(now.getTime() / 1000, parse.getTime() / 1000);
-  }
+        String apply = convert.to(now);
+        Date parse = convert.from(apply);
+        Assert.assertEquals(now.getTime() / 1000, parse.getTime() / 1000);
+    }
 
 }

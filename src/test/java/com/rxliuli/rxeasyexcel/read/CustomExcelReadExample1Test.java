@@ -16,37 +16,37 @@ import java.util.List;
  */
 public class CustomExcelReadExample1Test {
 
-  @Test
-  public void testCustom() {
-    InputStream inputStream = SimpleExcelReaderTest.class
-        .getClassLoader().getResourceAsStream("user3.xlsx");
-    ExcelReader reader = EasyExcel.read(inputStream);
+    @Test
+    public void testCustom() {
+        InputStream inputStream = SimpleExcelReaderTest.class
+                .getClassLoader().getResourceAsStream("user3.xlsx");
+        ExcelReader reader = EasyExcel.read(inputStream);
 
-    List<UserWithAnnotation> sheet1Result = reader.resolve(ExcelReadContext.<UserWithAnnotation>builder()
-        .clazz(UserWithAnnotation.class)
-        .headerStart(1)
-        .sheetIndex(0)
-        .readSheetHook((sheet, context) -> {
-          Row row = sheet.getRow(0);
-          Assert.assertEquals(row.getCell(0).getStringCellValue(), "custom header");
-        })
-        .build())
-        .getData();
+        List<UserWithAnnotation> sheet1Result = reader.resolve(ExcelReadContext.<UserWithAnnotation>builder()
+                .clazz(UserWithAnnotation.class)
+                .headerStart(1)
+                .sheetIndex(0)
+                .readSheetHook((sheet, context) -> {
+                    Row row = sheet.getRow(0);
+                    Assert.assertEquals(row.getCell(0).getStringCellValue(), "custom header");
+                })
+                .build())
+                .getData();
 
-    Assert.assertEquals(sheet1Result.size(), 5);
-    Assert.assertEquals(sheet1Result.get(1).getUsername(), "张三1");
+        Assert.assertEquals(sheet1Result.size(), 5);
+        Assert.assertEquals(sheet1Result.get(1).getUsername(), "张三1");
 
 
-    List<UserWithAnnotation> sheet2Result = reader.resolve(ExcelReadContext.<UserWithAnnotation>builder()
-        .clazz(UserWithAnnotation.class)
-        .sheetIndex(1)
-        .build())
-        .getData();
+        List<UserWithAnnotation> sheet2Result = reader.resolve(ExcelReadContext.<UserWithAnnotation>builder()
+                .clazz(UserWithAnnotation.class)
+                .sheetIndex(1)
+                .build())
+                .getData();
 
-    Assert.assertEquals(sheet2Result.size(), 5);
-    Assert.assertEquals(sheet2Result.get(1).getUsername(), "张三1");
+        Assert.assertEquals(sheet2Result.size(), 5);
+        Assert.assertEquals(sheet2Result.get(1).getUsername(), "张三1");
 
-  }
+    }
 
 
 }

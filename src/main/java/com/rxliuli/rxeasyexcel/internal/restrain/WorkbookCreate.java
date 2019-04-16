@@ -8,12 +8,13 @@ import org.apache.poi.ss.usermodel.Workbook;
  */
 public interface WorkbookCreate {
 
-  /**
-   * 创建对应的workbook
-   * @param mayRowCount 预测的数据量
-   * @return workbook
-   */
-  Workbook workbook(int mayRowCount);
+    /**
+     * 创建对应的workbook
+     *
+     * @param mayRowCount 预测的数据量
+     * @return workbook
+     */
+    Workbook workbook(int mayRowCount);
 
 }
 

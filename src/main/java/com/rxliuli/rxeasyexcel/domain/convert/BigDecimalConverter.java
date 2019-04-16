@@ -7,13 +7,13 @@ import java.math.BigDecimal;
  */
 public class BigDecimalConverter implements IConverter<BigDecimal> {
 
-  @Override
-  public String to(BigDecimal bigDecimal) {
-    return bigDecimal.toPlainString();
-  }
+    @Override
+    public String to(BigDecimal bigDecimal) {
+        return bigDecimal.toPlainString();
+    }
 
-  @Override
-  public BigDecimal from(String to) {
-    return new BigDecimal(to);
-  }
+    @Override
+    public BigDecimal from(String to) {
+        return new BigDecimal(to);
+    }
 }

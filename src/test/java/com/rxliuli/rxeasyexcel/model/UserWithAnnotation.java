@@ -18,15 +18,15 @@ import java.util.Date;
 @NoArgsConstructor
 public class UserWithAnnotation {
 
-  @ExcelField(columnName = "用户名")
-  private String username;
+    @ExcelField(columnName = "用户名")
+    private String username;
 
-  @ExcelField(columnName = "用户密码")
-  private String passwd;
+    @ExcelField(columnName = "用户密码")
+    private String passwd;
 
-  @ExcelIgnore
-  private String nickName;
+    @ExcelIgnore
+    private String nickName;
 
-  @ExcelField(columnName = "登录日期", convert = DateConverter.class)
-  private Date date;
+    @ExcelField(columnName = "登录日期", convert = DateConverter.class)
+    private Date date;
 }

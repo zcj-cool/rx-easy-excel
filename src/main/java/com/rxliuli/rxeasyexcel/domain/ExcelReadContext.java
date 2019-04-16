@@ -14,88 +14,88 @@ import java.util.function.BiConsumer;
  */
 public class ExcelReadContext<T> {
 
-  /**
-   * header读取出来的类
-   */
-  private Class<T> clazz;
+    /**
+     * header读取出来的类
+     */
+    private Class<T> clazz;
 
-  /**
-   * 所在sheet索引
-   */
-  private int sheetIndex = 0;
-  /**
-   * header所开始的第一行
-   */
-  private int headerStart = 0;
+    /**
+     * 所在sheet索引
+     */
+    private int sheetIndex = 0;
+    /**
+     * header所开始的第一行
+     */
+    private int headerStart = 0;
 
-  /**
-   * 读取sheet之后的操作
-   */
-  private BiConsumer<Sheet, ExcelReadContext> readSheetHook = (w, v) -> {
-  };
-  /**
-   * 表头与类属性之间的映射
-   */
-  private Map<String, ExcelReadHeader> headers;
+    /**
+     * 读取sheet之后的操作
+     */
+    private BiConsumer<Sheet, ExcelReadContext> readSheetHook = (w, v) -> {
+    };
+    /**
+     * 表头与类属性之间的映射
+     */
+    private Map<String, ExcelReadHeader> headers;
 
-  public static <T> ExcelReadContextBuilder<T> builder() {
-    return new ExcelReadContextBuilder<>(new ExcelReadContext<>());
-  }
-
-
-  // package set
-
-  public Class<T> getClazz() {
-    return clazz;
-  }
-
-  ExcelReadContext<T> setClazz(Class<T> clazz) {
-    this.clazz = clazz;
-    return this;
-  }
-
-  public int getSheetIndex() {
-    return sheetIndex;
-  }
-
-  ExcelReadContext<T> setSheetIndex(int sheetIndex) {
-    this.sheetIndex = sheetIndex;
-    return this;
-  }
-
-  public int getHeaderStart() {
-    return headerStart;
-  }
-
-  ExcelReadContext<T> setHeaderStart(int headerStart) {
-    this.headerStart = headerStart;
-    return this;
-  }
-
-  public BiConsumer<Sheet, ExcelReadContext> getReadSheetHook() {
-    return readSheetHook;
-  }
+    public static <T> ExcelReadContextBuilder<T> builder() {
+        return new ExcelReadContextBuilder<>(new ExcelReadContext<>());
+    }
 
 
-  // get
+    // package set
 
-  ExcelReadContext<T> setReadSheetHook(BiConsumer<Sheet, ExcelReadContext> readSheetHook) {
-    this.readSheetHook = readSheetHook;
-    return this;
-  }
+    public Class<T> getClazz() {
+        return clazz;
+    }
 
-  public Map<String, ExcelReadHeader> getHeaders() {
-    return headers;
-  }
+    ExcelReadContext<T> setClazz(Class<T> clazz) {
+        this.clazz = clazz;
+        return this;
+    }
 
-  ExcelReadContext<T> setHeaders(Map<String, ExcelReadHeader> headers) {
-    this.headers = headers;
-    return this;
-  }
+    public int getSheetIndex() {
+        return sheetIndex;
+    }
 
-  ExcelReadContext<T> setHeaders(Class<T> clazz) {
-    // 使用默认Header转换器
-    this.headers = ExcelBeanHelper.beanToReaderHeaders(clazz);
-    return this;
-  }
+    ExcelReadContext<T> setSheetIndex(int sheetIndex) {
+        this.sheetIndex = sheetIndex;
+        return this;
+    }
+
+    public int getHeaderStart() {
+        return headerStart;
+    }
+
+    ExcelReadContext<T> setHeaderStart(int headerStart) {
+        this.headerStart = headerStart;
+        return this;
+    }
+
+    public BiConsumer<Sheet, ExcelReadContext> getReadSheetHook() {
+        return readSheetHook;
+    }
+
+
+    // get
+
+    ExcelReadContext<T> setReadSheetHook(BiConsumer<Sheet, ExcelReadContext> readSheetHook) {
+        this.readSheetHook = readSheetHook;
+        return this;
+    }
+
+    public Map<String, ExcelReadHeader> getHeaders() {
+        return headers;
+    }
+
+    ExcelReadContext<T> setHeaders(Map<String, ExcelReadHeader> headers) {
+        this.headers = headers;
+        return this;
+    }
+
+    ExcelReadContext<T> setHeaders(Class<T> clazz) {
+        // 使用默认Header转换器
+        this.headers = ExcelBeanHelper.beanToReaderHeaders(clazz);
+        return this;
+    }
 }

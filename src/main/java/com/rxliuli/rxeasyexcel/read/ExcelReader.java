@@ -10,18 +10,18 @@ import com.rxliuli.rxeasyexcel.domain.ImportDomain;
  */
 public interface ExcelReader extends AutoCloseable {
 
-  /**
-   * 解析一张sheet
-   *
-   * @param context 该sheet对应的上下文
-   * @param <T>     要解析出来的类型
-   * @return 结果，包含正确数据与错误数据（格式/非业务相关）
-   */
-  <T> ImportDomain<T> resolve(ExcelReadContext<T> context);
+    /**
+     * 解析一张sheet
+     *
+     * @param context 该sheet对应的上下文
+     * @param <T>     要解析出来的类型
+     * @return 结果，包含正确数据与错误数据（格式/非业务相关）
+     */
+    <T> ImportDomain<T> resolve(ExcelReadContext<T> context);
 
-  /**
-   * 读取完释放资源
-   */
-  @Override
-  void close();
+    /**
+     * 读取完释放资源
+     */
+    @Override
+    void close();
 }

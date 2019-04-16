@@ -12,27 +12,27 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  * @since 2018/2/6
  */
 public enum ExcelType implements WorkbookCreate {
-  /**
-   * xls
-   */
-  XLS {
-    @Override
-    public Workbook workbook(int mayRowCount) {
-      return new HSSFWorkbook();
-    }
-  },
-  /**
-   * xlsx
-   */
-  XLSX {
-    @Override
-    public Workbook workbook(int mayRowCount) {
-      Workbook workbook = new XSSFWorkbook();
-      if (mayRowCount > 3000) {
-        workbook = new SXSSFWorkbook((XSSFWorkbook) workbook, 100);
-      }
-      return workbook;
-    }
-  };
+    /**
+     * xls
+     */
+    XLS {
+        @Override
+        public Workbook workbook(int mayRowCount) {
+            return new HSSFWorkbook();
+        }
+    },
+    /**
+     * xlsx
+     */
+    XLSX {
+        @Override
+        public Workbook workbook(int mayRowCount) {
+            Workbook workbook = new XSSFWorkbook();
+            if (mayRowCount > 3000) {
+                workbook = new SXSSFWorkbook((XSSFWorkbook) workbook, 100);
+            }
+            return workbook;
+        }
+    };
 
 }

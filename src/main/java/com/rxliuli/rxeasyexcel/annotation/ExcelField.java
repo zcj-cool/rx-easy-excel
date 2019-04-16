@@ -16,18 +16,18 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface ExcelField {
-  /**
-   * excel header name
-   */
-  String columnName() default "";
+    /**
+     * excel header name
+     */
+    String columnName() default "";
 
-  /**
-   * 写入时所采取的转换器
-   */
-  Class<? extends IConverter> convert() default NotSpecifyConverter.class;
+    /**
+     * 写入时所采取的转换器
+     */
+    Class<? extends IConverter> convert() default NotSpecifyConverter.class;
 
-  /**
-   * 表格的列排序，默认全部为 0（不排序）
-   */
-  int order() default 0;
+    /**
+     * 表格的列排序，默认全部为 0（不排序）
+     */
+    int order() default 0;
 }

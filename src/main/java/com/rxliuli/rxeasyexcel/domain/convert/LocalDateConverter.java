@@ -7,15 +7,15 @@ import java.time.format.DateTimeFormatter;
  * @author rxliuli
  */
 public class LocalDateConverter implements IConverter<LocalDate> {
-  private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-  @Override
-  public String to(LocalDate localDateTime) {
-    return DATE_FORMAT.format(localDateTime);
-  }
+    @Override
+    public String to(LocalDate localDateTime) {
+        return DATE_FORMAT.format(localDateTime);
+    }
 
-  @Override
-  public LocalDate from(String s) {
-    return LocalDate.parse(s, DATE_FORMAT);
-  }
+    @Override
+    public LocalDate from(String s) {
+        return LocalDate.parse(s, DATE_FORMAT);
+    }
 }

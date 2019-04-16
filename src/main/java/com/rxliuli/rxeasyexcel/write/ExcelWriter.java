@@ -9,16 +9,16 @@ import com.rxliuli.rxeasyexcel.domain.ExcelWriteContext;
  */
 public interface ExcelWriter {
 
-  /**
-   * 导出该表,此方法可以多次执行,每一次执行都是一张新表
-   *
-   * @param context 该表所需要的上下文信息
-   * @return ExcelWriter
-   */
-  ExcelWriter export(ExcelWriteContext context);
+    /**
+     * 导出该表,此方法可以多次执行,每一次执行都是一张新表
+     *
+     * @param context 该表所需要的上下文信息
+     * @return ExcelWriter
+     */
+    ExcelWriter export(ExcelWriteContext context);
 
-  /**
-   * 终结操作,写入对应的输出流汇总
-   */
-  void write();
+    /**
+     * 终结操作,写入对应的输出流汇总
+     */
+    void write();
 }

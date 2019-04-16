@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 public class Id {
 
-  @ExcelField(columnName = "id")
-  private Long id;
+    @ExcelField(columnName = "id")
+    private Long id;
 
 }

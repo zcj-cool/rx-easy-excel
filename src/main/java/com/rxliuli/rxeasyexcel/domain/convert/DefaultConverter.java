@@ -8,13 +8,13 @@ import java.util.Objects;
  * @author rxliuli
  */
 public class DefaultConverter implements IConverter<Object> {
-  @Override
-  public String to(Object o) {
-    return Objects.toString(o);
-  }
+    @Override
+    public String to(Object o) {
+        return Objects.toString(o);
+    }
 
-  @Override
-  public Object from(String s) {
-    return s;
-  }
+    @Override
+    public Object from(String s) {
+        return s;
+    }
 }

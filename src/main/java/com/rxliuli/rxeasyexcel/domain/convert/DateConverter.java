@@ -12,19 +12,19 @@ import java.util.Date;
  * @author rxliuli
  */
 public class DateConverter implements IConverter<Date> {
-  private static final FastDateFormat FAST_DATE_FORMAT = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
+    private static final FastDateFormat FAST_DATE_FORMAT = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
 
-  @Override
-  public String to(Date date) {
-    return FAST_DATE_FORMAT.format(date);
-  }
-
-  @Override
-  public Date from(String s) {
-    try {
-      return FAST_DATE_FORMAT.parse(s);
-    } catch (ParseException e) {
-      throw new ExcelException(e);
+    @Override
+    public String to(Date date) {
+        return FAST_DATE_FORMAT.format(date);
     }
-  }
+
+    @Override
+    public Date from(String s) {
+        try {
+            return FAST_DATE_FORMAT.parse(s);
+        } catch (ParseException e) {
+            throw new ExcelException(e);
+        }
+    }
 }

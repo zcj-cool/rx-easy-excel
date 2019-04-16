@@ -27,8 +27,6 @@
         <logback-core.version>1.2.3</logback-core.version>
         <lombok.version>1.16.18</lombok.version>
         <rx-easy-test-spring-boot-starter.version>0.0.3</rx-easy-test-spring-boot-starter.version>
-        <!-- 设置 github 服务器使用的配置，在 ~/.m2/settings.xml 中定义 -->
-        <github.global.server>github</github.global.server>
     </properties>
     <dependencies>
         <dependency>
