@@ -5,6 +5,7 @@ import com.rxliuli.rxeasyexcel.domain.ExcelImportError;
 import com.rxliuli.rxeasyexcel.domain.ExcelType;
 import com.rxliuli.rxeasyexcel.domain.ExcelWriteContext;
 import com.rxliuli.rxeasyexcel.domain.ExcelWriterHeader;
+import com.rxliuli.rxeasyexcel.domain.select.ExcelColumnType;
 import com.rxliuli.rxeasyexcel.internal.util.Assert;
 import com.rxliuli.rxeasyexcel.internal.util.ExcelBeanHelper;
 import org.apache.commons.lang3.StringUtils;
@@ -67,6 +68,10 @@ public class DefaultExcelWriter implements ExcelWriter {
         int[] tempCol = {0};
         LinkedHashMap<String, ExcelWriterHeader> headers = context.getHeaders();
         headers.forEach((k, v) -> {
+            // TODO 这里读取 select map
+            if (v.getType() == ExcelColumnType.SELECT) {
+                final Map<?, String> map = v.getSelectMap();
+            }
             Cell cell = headerRow.createCell(tempCol[0]++);
             cell.setCellValue(v.getName());
         });

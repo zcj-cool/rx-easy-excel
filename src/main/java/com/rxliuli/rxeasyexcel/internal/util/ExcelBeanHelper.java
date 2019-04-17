@@ -8,6 +8,7 @@ import com.rxliuli.rxeasyexcel.domain.ExcelWriterHeader;
 import com.rxliuli.rxeasyexcel.domain.convert.ConverterFactory;
 import com.rxliuli.rxeasyexcel.domain.convert.IConverter;
 import com.rxliuli.rxeasyexcel.domain.convert.NotSpecifyConverter;
+import com.rxliuli.rxeasyexcel.domain.select.SelectMapFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 
@@ -70,8 +71,8 @@ public class ExcelBeanHelper {
                 .filter(x -> Objects.isNull(x.getAnnotation(ExcelIgnore.class)))
                 .sorted(Comparator.comparing(x -> x.getAnnotation(ExcelField.class).order()))
                 .map(x -> {
-                    final Pair<String, ? extends IConverter> pair = castHeaderNameAndConverter(x);
-                    return new Pair<>(x.getName(), ExcelWriterHeader.create(pair.getKey(), pair.getValue()));
+                    final Triple<String, ? extends IConverter, ExcelField> triple = castHeaderNameAndConverter(x);
+                    return new Pair<>(x.getName(), ExcelWriterHeader.create(triple.getLeft(), triple.getMiddle(), SelectMapFactory.get(triple.getRight().select()), triple.getRight().type()));
                 })
                 .collect(LinkedHashMap::new, (l, v) -> l.put(v.getKey(), v.getValue()), HashMap::putAll);
     }
@@ -91,8 +92,8 @@ public class ExcelBeanHelper {
                 .filter(x -> Objects.isNull(x.getAnnotation(ExcelIgnore.class)))
                 .sorted(Comparator.comparing(x -> x.getAnnotation(ExcelField.class).order()))
                 .map(x -> {
-                    final Pair<String, ? extends IConverter> pair = castHeaderNameAndConverter(x);
-                    return new Pair<>(pair.getKey(), ExcelReadHeader.create(x, pair.getValue()));
+                    final Triple<String, ? extends IConverter, ExcelField> triple = castHeaderNameAndConverter(x);
+                    return new Pair<>(triple.getLeft(), ExcelReadHeader.create(x, triple.getMiddle(), SelectMapFactory.get(triple.getRight().select()), triple.getRight().type()));
                 })
                 .collect(HashMap::new, (l, v) -> l.put(v.getKey(), v.getValue()), HashMap::putAll);
     }
@@ -103,7 +104,7 @@ public class ExcelBeanHelper {
      * @param field 字段
      * @return 使用 {@link Pair} 封装的两个字段
      */
-    private static Pair<String, ? extends IConverter> castHeaderNameAndConverter(Field field) {
+    private static Triple<String, ? extends IConverter, ExcelField> castHeaderNameAndConverter(Field field) {
         field.setAccessible(true);
         ExcelField excelField = field.getAnnotation(ExcelField.class);
         // 如果 convertClass 未指定，则根据字段类型获取对应的默认转换器
@@ -114,7 +115,7 @@ public class ExcelBeanHelper {
         final IConverter<?> convert = ConvertHelper.getConvert(convertClass);
         final String columnName = excelField.columnName();
         final String name = StringUtils.isEmpty(columnName) ? field.getName() : columnName;
-        return new Pair<>(name, convert);
+        return Triple.of(name, convert, excelField);
     }
 
     /**

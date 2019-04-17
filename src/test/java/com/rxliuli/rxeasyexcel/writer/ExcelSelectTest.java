@@ -1,49 +1,32 @@
-package com.rxliuli.rxeasyexcel.read;
+package com.rxliuli.rxeasyexcel.writer;
 
 import com.rxliuli.rxeasyexcel.EasyExcel;
 import com.rxliuli.rxeasyexcel.annotation.ExcelField;
-import com.rxliuli.rxeasyexcel.domain.ExcelImportError;
-import com.rxliuli.rxeasyexcel.domain.ExcelReadContext;
 import com.rxliuli.rxeasyexcel.domain.ExcelWriteContext;
-import com.rxliuli.rxeasyexcel.domain.ImportDomain;
-import com.rxliuli.rxeasyexcel.writer.DateFieldTest;
+import com.rxliuli.rxeasyexcel.domain.select.ExcelColumnType;
+import com.rxliuli.rxeasyexcel.domain.select.ISelectMap;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author rxliuli
  */
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ErrorImportTest {
-    private final String currentPath = DateFieldTest.class.getClassLoader().getResource(".").getPath();
+class ExcelSelectTest {
+    private final String currentPath = ExcelSelectTest.class.getClassLoader().getResource(".").getPath();
     private final int count = 5;
-    private String fileName = currentPath + "/ErrorImportTest.xlsx";
-
-    static String join(Collection<?> collection) {
-        return collection.stream()
-                .map(ToStringBuilder::reflectionToString)
-                .collect(Collectors.joining("\n"));
-    }
+    private String fileName = currentPath + "/ExcelSelectTest.xlsx";
 
     @Test
-    @Order(1)
-    void exportDateList() {
+    void excelExport() {
         final List<Person> users = mockUser(count);
         EasyExcel.export(fileName)
                 .export(ExcelWriteContext.builder()
@@ -53,40 +36,23 @@ class ErrorImportTest {
                 .write();
     }
 
-    @Test
-    @Order(2)
-    void importDateList() {
-        ImportDomain<Person> result = new ImportDomain<>();
-        try (InputStream is = new FileInputStream(currentPath + "ErrorImportTestExcel.xlsx");
-             final ExcelReader reader = EasyExcel.read(is)) {
-            result = reader.resolve(ExcelReadContext.<Person>builder()
-                    .clazz(Person.class)
-                    .build());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        final List<Person> data = result.getData();
-        System.out.println(join(data));
-        List<ExcelImportError> errorList = result.getErrors();
-        System.out.println(join(errorList));
-        assertThat(data)
-                .hasSize(count);
-        assertThat(errorList)
-                .hasSize(3);
-
-        EasyExcel.export(fileName)
-                .export(ExcelWriteContext.builder()
-                        .datasource(data)
-                        .errors(errorList)
-                        .build()
-                )
-                .write();
-    }
-
     private List<Person> mockUser(int count) {
         return IntStream.range(0, count)
                 .mapToObj(i -> new Person("姓名 " + i, new Date(), LocalDate.now(), LocalTime.now()))
                 .collect(Collectors.toList());
+    }
+
+    public static class PersonSelect {
+        public static class UsernameMap implements ISelectMap<Integer> {
+            @Override
+            public Map<Integer, String> getMap() {
+                final Map<Integer, String> map = new HashMap<>();
+                map.put(1, "保密");
+                map.put(2, "男");
+                map.put(3, "女");
+                return map;
+            }
+        }
     }
 
     public static class Person {
@@ -98,6 +64,8 @@ class ErrorImportTest {
         private LocalDate localDate;
         @ExcelField(columnName = "本地时间", order = 4)
         private LocalTime localTime;
+        @ExcelField(columnName = "性别", order = 5, type = ExcelColumnType.SELECT, select = PersonSelect.UsernameMap.class)
+        private Integer gender;
 
         public Person() {
         }
@@ -115,6 +83,33 @@ class ErrorImportTest {
 
         public Person setDate(Date date) {
             this.date = date;
+            return this;
+        }
+
+        public LocalDate getLocalDate() {
+            return localDate;
+        }
+
+        public Person setLocalDate(LocalDate localDate) {
+            this.localDate = localDate;
+            return this;
+        }
+
+        public LocalTime getLocalTime() {
+            return localTime;
+        }
+
+        public Person setLocalTime(LocalTime localTime) {
+            this.localTime = localTime;
+            return this;
+        }
+
+        public Integer getGender() {
+            return gender;
+        }
+
+        public Person setGender(Integer gender) {
+            this.gender = gender;
             return this;
         }
 

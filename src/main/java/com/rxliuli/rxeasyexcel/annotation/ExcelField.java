@@ -3,6 +3,9 @@ package com.rxliuli.rxeasyexcel.annotation;
 
 import com.rxliuli.rxeasyexcel.domain.convert.IConverter;
 import com.rxliuli.rxeasyexcel.domain.convert.NotSpecifyConverter;
+import com.rxliuli.rxeasyexcel.domain.select.DefaultSelectMap;
+import com.rxliuli.rxeasyexcel.domain.select.ExcelColumnType;
+import com.rxliuli.rxeasyexcel.domain.select.ISelectMap;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -32,7 +35,17 @@ public @interface ExcelField {
     int order() default 0;
 
     /**
+     * 当前列的类型，默认为普通文本
+     */
+    ExcelColumnType type() default ExcelColumnType.TEXT;
+
+    /**
+     * 下拉框对应的数据提供类，默认为 {@link null}
+     */
+    Class<? extends ISelectMap<?>> select() default DefaultSelectMap.class;
+
+    /**
      * 错误消息，默认为 ""
      */
-    String msg() default "";
+    String errMsg() default "";
 }

@@ -77,11 +77,13 @@ public class DefaultExcelReader implements ExcelReader {
                 }
                 Object value = null;
                 final Field field = tempHeader.getField();
+                final ExcelField excelField = field.getAnnotation(ExcelField.class);
                 try {
+                    // TODO 这里不知是否要对 Excel 进行特殊的处理
                     value = tempHeader.getConvert().from(columnValue);
                 } catch (Exception e) {
                     // 如果解析错误则记录下来
-                    final String msg = field.getAnnotation(ExcelField.class).msg();
+                    final String msg = excelField.errMsg();
                     errorList.add(new ExcelImportError(i, columnIndex, field.getName(), columnValue, e, StringUtils.isEmpty(msg) ? null : msg));
                 }
                 ExcelBeanHelper.fieldSetValue(field, instance, value);
