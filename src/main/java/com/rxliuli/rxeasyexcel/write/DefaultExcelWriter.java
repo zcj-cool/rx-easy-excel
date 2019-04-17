@@ -67,13 +67,17 @@ public class DefaultExcelWriter implements ExcelWriter {
         Row headerRow = sheet.createRow(startRow++);
         int[] tempCol = {0};
         LinkedHashMap<String, ExcelWriterHeader> headers = context.getHeaders();
+        // 绘图对象
+        final Drawing<?> drawing = sheet.createDrawingPatriarch();
         headers.forEach((k, v) -> {
             // TODO 这里读取 select map
             if (v.getType() == ExcelColumnType.SELECT) {
                 final Map<?, String> map = v.getSelectMap();
             }
+            final Comment comment = createComment(drawing, v.getPrompt());
             Cell cell = headerRow.createCell(tempCol[0]++);
             cell.setCellValue(v.getName());
+            cell.setCellComment(comment);
         });
 
         // 写数据
@@ -87,8 +91,6 @@ public class DefaultExcelWriter implements ExcelWriter {
             });
         }
 
-        // 绘图对象
-        final Drawing<?> drawing = sheet.createDrawingPatriarch();
 
         // 写错误数据
         final List<ExcelImportError> errors = context.getErrors();
@@ -108,7 +110,7 @@ public class DefaultExcelWriter implements ExcelWriter {
         final CellStyle style = this.createErrorCellStyle();
         cell.setCellValue(error.getVal());
         cell.setCellStyle(style);
-        final Comment comment = createComment(drawing, error);
+        final Comment comment = createComment(drawing, error.getMsg());
         cell.setCellComment(comment);
     }
 
@@ -116,12 +118,12 @@ public class DefaultExcelWriter implements ExcelWriter {
      * 获取一个单元格批注对象
      *
      * @param drawing 绘图对象
-     * @param error   错误信息
+     * @param prompt  提示信息
      * @return 批注
      */
-    public Comment createComment(Drawing<?> drawing, ExcelImportError error) {
+    private Comment createComment(Drawing<?> drawing, String prompt) {
         final Comment comment = drawing.createCellComment(this.workbook.getCreationHelper().createClientAnchor());
-        comment.setString(this.excelType == ExcelType.XLSX ? new XSSFRichTextString(error.getMsg()) : new HSSFRichTextString(error.getMsg()));
+        comment.setString(this.excelType == ExcelType.XLSX ? new XSSFRichTextString(prompt) : new HSSFRichTextString(prompt));
         return comment;
     }
 

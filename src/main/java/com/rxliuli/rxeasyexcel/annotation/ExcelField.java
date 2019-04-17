@@ -45,6 +45,11 @@ public @interface ExcelField {
     Class<? extends ISelectMap<?>> select() default DefaultSelectMap.class;
 
     /**
+     * 表头提示
+     */
+    String prompt() default "";
+
+    /**
      * 错误消息，默认为 ""
      */
     String errMsg() default "";

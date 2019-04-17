@@ -55,14 +55,6 @@ public class ExcelBeanHelper {
      */
     @SuppressWarnings("unchecked")
     public static <T> LinkedHashMap<String, ExcelWriterHeader> beanToWriterHeaders(T bean) {
-        if (bean instanceof LinkedHashMap) {
-            return ((Map<String, ?>) bean)
-                    .keySet()
-                    .stream()
-                    .collect(LinkedHashMap::new,
-                            (l, v) -> l.put(v, ExcelWriterHeader.create(v)),
-                            Map::putAll);
-        }
         // 为bean情况 获取到所有字段
         return SuperClassUtil.getAllDeclaredField(bean.getClass()).stream()
                 // 过滤掉没有使用 ExcelField 注解指定的字段
@@ -72,7 +64,7 @@ public class ExcelBeanHelper {
                 .sorted(Comparator.comparing(x -> x.getAnnotation(ExcelField.class).order()))
                 .map(x -> {
                     final Triple<String, ? extends IConverter, ExcelField> triple = castHeaderNameAndConverter(x);
-                    return new Pair<>(x.getName(), ExcelWriterHeader.create(triple.getLeft(), triple.getMiddle(), SelectMapFactory.get(triple.getRight().select()), triple.getRight().type()));
+                    return new Pair<>(x.getName(), ExcelWriterHeader.create(triple.getLeft(), triple.getMiddle(), SelectMapFactory.get(triple.getRight().select()), triple.getRight().type(), triple.getRight().prompt()));
                 })
                 .collect(LinkedHashMap::new, (l, v) -> l.put(v.getKey(), v.getValue()), HashMap::putAll);
     }
