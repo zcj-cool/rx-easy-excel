@@ -30,4 +30,9 @@ public @interface ExcelField {
      * 表格的列排序，默认全部为 0（不排序）
      */
     int order() default 0;
+
+    /**
+     * 错误消息，默认为 ""
+     */
+    String msg() default "";
 }

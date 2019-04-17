@@ -1,6 +1,7 @@
 package com.rxliuli.rxeasyexcel.read;
 
 import com.rxliuli.rxeasyexcel.ExcelException;
+import com.rxliuli.rxeasyexcel.annotation.ExcelField;
 import com.rxliuli.rxeasyexcel.domain.ExcelImportError;
 import com.rxliuli.rxeasyexcel.domain.ExcelReadContext;
 import com.rxliuli.rxeasyexcel.domain.ExcelReadHeader;
@@ -15,6 +16,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -74,13 +76,15 @@ public class DefaultExcelReader implements ExcelReader {
                     return;
                 }
                 Object value = null;
+                final Field field = tempHeader.getField();
                 try {
                     value = tempHeader.getConvert().from(columnValue);
                 } catch (Exception e) {
                     // 如果解析错误则记录下来
-                    errorList.add(new ExcelImportError(i, columnIndex, tempHeader.getField().getName(), columnValue, e));
+                    final String msg = field.getAnnotation(ExcelField.class).msg();
+                    errorList.add(new ExcelImportError(i, columnIndex, field.getName(), columnValue, e, StringUtils.isEmpty(msg) ? null : msg));
                 }
-                ExcelBeanHelper.fieldSetValue(tempHeader.getField(), instance, value);
+                ExcelBeanHelper.fieldSetValue(field, instance, value);
             });
 
             resultContainer.add(instance);

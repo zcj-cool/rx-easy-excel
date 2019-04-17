@@ -94,7 +94,7 @@ class ErrorImportTest {
         private String username;
         @ExcelField(columnName = "日期", order = 2)
         private Date date;
-        @ExcelField(columnName = "本地日期", order = 3)
+        @ExcelField(columnName = "本地日期", order = 3, msg = "本地日期错误，请务必输入正确的日期。例如 2018-12-11")
         private LocalDate localDate;
         @ExcelField(columnName = "本地时间", order = 4)
         private LocalTime localTime;

@@ -27,6 +27,9 @@
         <logback-core.version>1.2.3</logback-core.version>
         <lombok.version>1.16.18</lombok.version>
         <rx-easy-test-spring-boot-starter.version>0.0.3</rx-easy-test-spring-boot-starter.version>
+        
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
         <charset.UTF8>UTF-8</charset.UTF8>
     </properties>
     <dependencies>

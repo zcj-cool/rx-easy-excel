@@ -26,16 +26,30 @@ public class ExcelImportError {
      * 抛出的异常
      */
     private Exception e;
+    /**
+     * 错误消息，默认为空（该参数必须手动设置）
+     */
+    private String msg;
 
     public ExcelImportError() {
     }
 
-    public ExcelImportError(int row, int col, String field, String val, Exception e) {
+    public ExcelImportError(int row, int col, String field, String val, Exception e, String msg) {
         this.row = row;
         this.col = col;
         this.field = field;
         this.val = val;
         this.e = e;
+        this.msg = msg;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public ExcelImportError setMsg(String msg) {
+        this.msg = msg;
+        return this;
     }
 
     public int getRow() {
