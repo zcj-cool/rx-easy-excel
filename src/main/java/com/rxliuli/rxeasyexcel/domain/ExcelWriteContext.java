@@ -70,18 +70,8 @@ public class ExcelWriteContext {
      *
      * @param bean bean
      */
-    @SuppressWarnings("unchecked")
     <T> ExcelWriteContext setHeaders(T bean) {
-        if (bean instanceof Map) {
-            ((Map<String, ?>) bean)
-                    .keySet()
-                    .stream()
-                    .collect(LinkedHashMap::new,
-                            (l, v) -> l.put(v, ExcelWriterHeader.create(v)),
-                            Map::putAll);
-        } else {
-            this.headers = ExcelBeanHelper.beanToWriterHeaders(bean);
-        }
+        this.headers = ExcelBeanHelper.beanToWriterHeaders(bean);
         return this;
     }
 

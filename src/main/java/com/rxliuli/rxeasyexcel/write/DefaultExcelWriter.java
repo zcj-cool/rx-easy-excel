@@ -8,10 +8,13 @@ import com.rxliuli.rxeasyexcel.domain.ExcelWriterHeader;
 import com.rxliuli.rxeasyexcel.domain.select.ExcelColumnType;
 import com.rxliuli.rxeasyexcel.internal.util.Assert;
 import com.rxliuli.rxeasyexcel.internal.util.ExcelBeanHelper;
+import com.rxliuli.rxeasyexcel.internal.util.tuple.Tuple;
+import com.rxliuli.rxeasyexcel.internal.util.tuple.Tuple2;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.slf4j.Logger;
@@ -20,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -70,13 +74,11 @@ public class DefaultExcelWriter implements ExcelWriter {
         Row headerRow = sheet.createRow(startRow++);
         final AtomicInteger tempCol = new AtomicInteger(0);
         LinkedHashMap<String, ExcelWriterHeader> headers = context.getHeaders();
+        // 下拉框数据
+        final LinkedList<Tuple2<String[], Integer>> selectTupleList = new LinkedList<>();
         // 绘图对象
         final Drawing<?> drawing = sheet.createDrawingPatriarch();
         headers.forEach((k, v) -> {
-            // TODO 这里读取 select map
-            if (v.getType() == ExcelColumnType.SELECT) {
-                final Map<?, String> map = v.getSelectMap();
-            }
             Cell cell = headerRow.createCell(tempCol.getAndIncrement());
             cell.setCellValue(v.getName());
             // 批注
@@ -85,6 +87,25 @@ public class DefaultExcelWriter implements ExcelWriter {
                 final Comment comment = createComment(drawing, prompt, cell.getRowIndex(), cell.getColumnIndex());
                 cell.setCellComment(comment);
             }
+            // 下拉框数据记录
+            if (v.getType() == ExcelColumnType.SELECT) {
+                selectTupleList.push(Tuple.of(v.getSelectMap().values().toArray(new String[]{}), cell.getColumnIndex()));
+            }
+        });
+
+        // 下拉框设置
+        selectTupleList.forEach(tuple3 -> {
+            final DataValidationHelper helper = sheet.getDataValidationHelper();
+
+            // 约束值
+            final DataValidationConstraint constraint = helper.createExplicitListConstraint(tuple3.getV1());
+            constraint.setExplicitListValues(tuple3.getV1());
+            // 作用范围
+            final Integer col = tuple3.getV2();
+            final CellRangeAddressList regions = new CellRangeAddressList(1, 50000, col, col);
+            final DataValidation validation = helper.createValidation(constraint, regions);
+
+            sheet.addValidationData(validation);
         });
 
         // 写数据
@@ -94,10 +115,20 @@ public class DefaultExcelWriter implements ExcelWriter {
             headers.forEach((k, v) -> {
                 Cell cell = row.createCell(tempCol.getAndIncrement());
                 Object value = rowData.get(k);
-                ExcelBeanHelper.autoFitCell(cell, value == null ? null : v.getConvert().to(value));
+                final String text;
+                switch (v.getType()) {
+                    case TEXT:
+                        text = value == null ? null : v.getConvert().to(value);
+                        break;
+                    case SELECT:
+                        text = value == null ? null : v.getSelectMap().getOrDefault(value, null);
+                        break;
+                    default:
+                        text = null;
+                }
+                ExcelBeanHelper.autoFitCell(cell, text);
             });
         }
-
 
         // 写错误数据
         final List<ExcelImportError> errors = context.getErrors();

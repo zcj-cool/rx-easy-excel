@@ -1,7 +1,6 @@
 package com.rxliuli.rxeasyexcel.domain;
 
 
-import com.rxliuli.rxeasyexcel.domain.convert.DefaultConverter;
 import com.rxliuli.rxeasyexcel.domain.convert.IConverter;
 import com.rxliuli.rxeasyexcel.domain.select.ExcelColumnType;
 
@@ -15,21 +14,26 @@ import java.util.Map;
 public class ExcelReadHeader extends BaseExcelHeader {
 
     /**
+     * 下拉框的 Map，仅在 {@link super#getType()} 为 {@link ExcelColumnType#SELECT} 时有值
+     */
+    private final Map<String, ?> selectMap;
+    /**
      * 对应的属性字段
      */
-    private Field field;
+    private final Field field;
 
-    private ExcelReadHeader(Field field, IConverter<Object> convert, Map<?, String> selectMap, ExcelColumnType type) {
-        super(convert, selectMap, type);
+    private ExcelReadHeader(Field field, IConverter<Object> convert, Map<String, ?> selectMap, ExcelColumnType type) {
+        super(convert, type);
         this.field = field;
+        this.selectMap = selectMap;
     }
 
-    public static ExcelReadHeader create(Field field, IConverter<Object> convert, Map<?, String> selectMap, ExcelColumnType type) {
+    public static ExcelReadHeader create(Field field, IConverter<Object> convert, Map<String, ?> selectMap, ExcelColumnType type) {
         return new ExcelReadHeader(field, convert, selectMap, type);
     }
 
-    public static ExcelReadHeader create(Field field) {
-        return new ExcelReadHeader(field, new DefaultConverter(), null, ExcelColumnType.TEXT);
+    public Map<String, ?> getSelectMap() {
+        return selectMap;
     }
 
     public Field getField() {

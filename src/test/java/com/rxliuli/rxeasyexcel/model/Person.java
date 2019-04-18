@@ -18,13 +18,13 @@ import java.util.Date;
 public class Person {
     @ExcelField(columnName = "姓名")
     private String username;
-    @ExcelField(columnName = "生日", convert = LocalDateTimeConverter.class)
+    @ExcelField(columnName = "生日", converter = LocalDateTimeConverter.class)
     private LocalDateTime birthday;
-    @ExcelField(columnName = "日期", convert = DateConverter.class)
+    @ExcelField(columnName = "日期", converter = DateConverter.class)
     private Date date;
-    @ExcelField(columnName = "本地日期", convert = LocalDateConverter.class)
+    @ExcelField(columnName = "本地日期", converter = LocalDateConverter.class)
     private LocalDate localDate;
-    @ExcelField(columnName = "本地时间", convert = LocalTimeConverter.class)
+    @ExcelField(columnName = "本地时间", converter = LocalTimeConverter.class)
     private LocalTime localTime;
 
     public Person() {

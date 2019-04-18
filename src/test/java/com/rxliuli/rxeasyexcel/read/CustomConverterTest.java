@@ -117,7 +117,7 @@ class CustomConverterTest {
         private String username;
         @ExcelField(columnName = "日期", order = 2)
         private Date date;
-        @ExcelField(columnName = "本地日期", order = 3, convert = CustomLocalDateConverter.class)
+        @ExcelField(columnName = "本地日期", order = 3, converter = CustomLocalDateConverter.class)
         private LocalDate localDate;
         @ExcelField(columnName = "本地时间", order = 4)
         private LocalTime localTime;

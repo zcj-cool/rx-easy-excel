@@ -86,8 +86,8 @@ public class ExcelBeanHelper {
                 .filter(x -> Objects.isNull(x.getAnnotation(ExcelIgnore.class)))
                 .sorted(Comparator.comparing(x -> x.getAnnotation(ExcelField.class).order()))
                 .map(x -> {
-                    final Tuple3<String, ? extends IConverter<Object>, ExcelField> triple = castHeaderNameAndConverter(x);
-                    return Tuple.of(triple.getV1(), ExcelReadHeader.create(x, triple.getV2(), SelectMapFactory.get(triple.getV3().select()), triple.getV3().type()));
+                    final Tuple3<String, ? extends IConverter<Object>, ExcelField> tuple3 = castHeaderNameAndConverter(x);
+                    return Tuple.of(tuple3.getV1(), ExcelReadHeader.create(x, tuple3.getV2(), SelectMapFactory.getReverse(tuple3.getV3().select()), tuple3.getV3().type()));
                 })
                 .collect(HashMap::new, (l, v) -> l.put(v.getV1(), v.getV2()), HashMap::putAll);
     }
@@ -102,7 +102,7 @@ public class ExcelBeanHelper {
         field.setAccessible(true);
         ExcelField excelField = field.getAnnotation(ExcelField.class);
         // 如果 convertClass 未指定，则根据字段类型获取对应的默认转换器
-        Class<? extends IConverter> convertClass = excelField.convert();
+        Class<? extends IConverter> convertClass = excelField.converter();
         if (NotSpecifyConverter.class.equals(convertClass)) {
             convertClass = ConverterFactory.get(field.getType());
         }

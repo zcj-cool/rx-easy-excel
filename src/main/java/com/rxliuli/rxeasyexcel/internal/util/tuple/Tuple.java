@@ -32,9 +32,10 @@ public interface Tuple {
 
     /**
      * 生成一个三元元组
-     * @param v1 第一个元素
-     * @param v2 第二个元素
-     * @param v3 第三个元素
+     *
+     * @param v1   第一个元素
+     * @param v2   第二个元素
+     * @param v3   第三个元素
      * @param <V1> 第一个元素的类型
      * @param <V2> 第二个元素的类型
      * @param <V3> 第三个元素的类型
@@ -46,10 +47,11 @@ public interface Tuple {
 
     /**
      * 生成一个四元元组
-     * @param v1 第一个元素
-     * @param v2 第二个元素
-     * @param v3 第三个元素
-     * @param v4 第四个元素
+     *
+     * @param v1   第一个元素
+     * @param v2   第二个元素
+     * @param v3   第三个元素
+     * @param v4   第四个元素
      * @param <V1> 第一个元素的类型
      * @param <V2> 第二个元素的类型
      * @param <V3> 第三个元素的类型

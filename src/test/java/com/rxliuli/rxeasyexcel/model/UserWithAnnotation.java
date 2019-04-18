@@ -21,7 +21,7 @@ public class UserWithAnnotation {
     @ExcelIgnore
     private String nickName;
 
-    @ExcelField(columnName = "登录日期", convert = DateConverter.class)
+    @ExcelField(columnName = "登录日期", converter = DateConverter.class)
     private Date date;
 
     public UserWithAnnotation() {

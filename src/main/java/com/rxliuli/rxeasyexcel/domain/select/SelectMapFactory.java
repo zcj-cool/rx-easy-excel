@@ -1,11 +1,16 @@
 package com.rxliuli.rxeasyexcel.domain.select;
 
+import com.rxliuli.rxeasyexcel.internal.util.MapUtil;
+import com.rxliuli.rxeasyexcel.internal.util.tuple.Tuple;
+import com.rxliuli.rxeasyexcel.internal.util.tuple.Tuple2;
 import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * 下拉框数据工厂
@@ -18,35 +23,54 @@ public class SelectMapFactory {
     /**
      * 缓存 Map
      */
-    private static Map<Class, Map<?, String>> cacheMap = new ConcurrentHashMap<>();
+    private static Map<Class, Tuple2<Map<?, String>, Map<String, ?>>> cacheMap = new ConcurrentHashMap<>();
 
     private SelectMapFactory() {
+    }
+
+    /**
+     * 获取 tuple
+     *
+     * @param clazz 类型
+     * @return 缓存的元组
+     */
+    private static Tuple2<Map<?, String>, Map<String, ?>> getTuple(Class<? extends ISelectMap<?>> clazz) {
+        if (clazz == DefaultSelectMap.class) {
+            return Tuple.of(null, null);
+        }
+        if (!cacheMap.containsKey(clazz)) {
+            final ISelectMap<?> instance;
+            try {
+                instance = clazz.newInstance();
+                Map<?, String> map = instance.getMap();
+                final AtomicInteger i = new AtomicInteger(0);
+                map = map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, kv -> kv.getValue() + "-" + i.getAndIncrement()));
+                SelectMapFactory.cacheMap.put(clazz, Tuple.of(map, MapUtil.reverse(map)));
+            } catch (InstantiationException | IllegalAccessException e) {
+                log.error("获取 Map 错误，当前类没有无参的构造函数: {}", clazz);
+            }
+        }
+        return cacheMap.get(clazz);
     }
 
     /**
      * 根据类型获取到对应的下拉框数据
      *
      * @param clazz 类型
-     * @param <T>   下拉框对应字段的类型
      * @return 数据 Map
      */
-    @SuppressWarnings("unchecked")
-    public static <T> Map<T, String> get(Class<? extends ISelectMap<?>> clazz) {
-        if (clazz == DefaultSelectMap.class) {
-            return null;
-        }
-        Map<?, String> map = SelectMapFactory.cacheMap.getOrDefault(clazz, null);
-        if (map == null) {
-            final ISelectMap<?> instance;
-            try {
-                instance = clazz.newInstance();
-                map = instance.getMap();
-                SelectMapFactory.cacheMap.put(clazz, map);
-            } catch (InstantiationException | IllegalAccessException e) {
-                log.error("获取 Map 错误，当前类没有无参的构造函数: {}", clazz);
-            }
-        }
-        return (Map<T, String>) map;
+    public static Map<?, String> get(Class<? extends ISelectMap<?>> clazz) {
+        return getTuple(clazz).getV1();
+    }
+
+    /**
+     * 得到一个反转的 Map
+     *
+     * @param clazz 类型
+     * @return 反转的数据 Map
+     */
+    public static Map<String, ?> getReverse(Class<? extends ISelectMap<?>> clazz) {
+        return getTuple(clazz).getV2();
     }
 
     /**

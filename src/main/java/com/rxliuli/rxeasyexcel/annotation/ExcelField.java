@@ -27,7 +27,7 @@ public @interface ExcelField {
     /**
      * 写入时所采取的转换器
      */
-    Class<? extends IConverter> convert() default NotSpecifyConverter.class;
+    Class<? extends IConverter> converter() default NotSpecifyConverter.class;
 
     /**
      * 表格的列排序，默认全部为 0（不排序）
@@ -41,6 +41,7 @@ public @interface ExcelField {
 
     /**
      * 下拉框对应的数据提供类，默认为 {@link null}
+     * 注意，如果提供了这个，则 converter 将会失效
      */
     Class<? extends ISelectMap<?>> select() default DefaultSelectMap.class;
 

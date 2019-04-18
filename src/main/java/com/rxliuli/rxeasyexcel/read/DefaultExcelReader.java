@@ -79,8 +79,16 @@ public class DefaultExcelReader implements ExcelReader {
                 final Field field = tempHeader.getField();
                 final ExcelField excelField = field.getAnnotation(ExcelField.class);
                 try {
-                    // TODO 这里不知是否要对 Excel 进行特殊的处理
-                    value = tempHeader.getConvert().from(columnValue);
+                    switch (tempHeader.getType()) {
+                        case TEXT:
+                            value = tempHeader.getConvert().from(columnValue);
+                            break;
+                        case SELECT:
+                            value = tempHeader.getSelectMap().getOrDefault(columnValue, null);
+                            break;
+                        default:
+                            value = null;
+                    }
                 } catch (Exception e) {
                     // 如果解析错误则记录下来
                     final String msg = excelField.errMsg();
