@@ -9,14 +9,14 @@
 添加仓库
 
 ```xml
-<repositories>
-  <repository>
-    <id>rx-easy-test-spring-boot-starter</id>
-    <url>
-      https://raw.githubusercontent.com/rxliuli/easy-excel/mvn-repo/repository
-    </url>
-  </repository>
-</repositories>
+<repository>
+  <snapshots>
+    <enabled>false</enabled>
+  </snapshots>
+  <id>central</id>
+  <name>bintray</name>
+  <url>http://jcenter.bintray.com</url>
+</repository>
 ```
 
 添加依赖
@@ -25,7 +25,7 @@
 <dependency>
   <groupId>com.rxliuli</groupId>
   <artifactId>rx-easy-excel</artifactId>
-  <version>0.1.0</version>
+  <version>1.0.4</version>
 </dependency>
 ```
 
@@ -67,38 +67,95 @@ public class UserWithAnnotation {
 **export**: 导出
 
 ```java
- @Test
-  public void testSimpleWithAnnotationExport() {
-    List<UserWithAnnotation> users = mockUserWithAnnotation(5);
-    EasyExcel.export("/tmp/test.xlsx")
-        .export(ExcelWriteContext.builder()
-            .datasource(users)
-            .sheetName("user")
-            .build())
-        .write();
-  }
+@Test
+ public void testSimpleWithAnnotationExport() {
+   List<UserWithAnnotation> users = mockUserWithAnnotation(5);
+   EasyExcel.export("/tmp/test.xlsx")
+       .export(ExcelWriteContext.builder()
+           .datasource(users)
+           .sheetName("user")
+           .build())
+       .write();
+}
 ```
 
 **import**: 导入
 
 ```java
- @Test
-  public void testRead2() {
-    InputStream inputStream = SimpleExcelReaderTest.class
-        .getClassLoader().getResourceAsStream("user2.xlsx");
-    ExcelReader reader = EasyExcel.read(inputStream);
+@Test
+public void testRead2() {
+  InputStream inputStream = SimpleExcelReaderTest.class
+      .getClassLoader().getResourceAsStream("user2.xlsx");
+  ExcelReader reader = EasyExcel.read(inputStream);
 
-    List<UserWithAnnotation> result = reader.resolve(ExcelReadContext.<UserWithAnnotation>builder()
-        .clazz(UserWithAnnotation.class)
-        .build())
-        .getData();
+  List<UserWithAnnotation> result = reader.resolve(ExcelReadContext.<UserWithAnnotation>builder()
+      .clazz(UserWithAnnotation.class)
+      .build())
+      .getData();
 
-    Assert.assertEquals(result.size(), 5);
-    Assert.assertEquals(result.get(0).getPasswd(), "0b6df627-5975-417b-abc9-1f2bad5ca1e2");
-    Assert.assertEquals(result.get(1).getUsername(), "张三1");
+  Assert.assertEquals(result.size(), 5);
+  Assert.assertEquals(result.get(0).getPasswd(), "0b6df627-5975-417b-abc9-1f2bad5ca1e2");
+  Assert.assertEquals(result.get(1).getUsername(), "张三1");
 
-    reader.close();
-  }
+  reader.close();
+}
+```
+
+### 下拉框
+
+实体类
+
+```java
+public static class Person {
+    @ExcelField(columnName = "姓名", order = 1, prompt = "请输入真实姓名", type = ExcelColumnType.SELECT, select = PersonSelect.UsernameMap.class)
+    private String username;
+    @ExcelField(columnName = "日期", order = 2, prompt = "请输入一个正确的日期，格式为 yyyy-MM-dd。例如 2018-12-11")
+    private Date date;
+    @ExcelField(columnName = "本地日期", order = 3, errMsg = "本地日期错误，请务必输入正确的日期。例如 2018-12-11")
+    private LocalDate localDate;
+    @ExcelField(columnName = "本地时间", order = 4)
+    private LocalTime localTime;
+
+    // getter/setter...
+}
+```
+
+导出
+
+```java
+@Test
+void exportDateList() {
+    final List<Person> users = mockUser(count);
+    EasyExcel.export(fileName)
+            .export(ExcelWriteContext.builder()
+                    .datasource(users)
+                    .sheetName("user")
+                    .build())
+            .write();
+}
+```
+
+导入
+
+```java
+@Test
+void importDateList() {
+    ImportDomain<Person> result = new ImportDomain<>();
+    try (InputStream is = new FileInputStream(fileName);
+         final ExcelReader reader = EasyExcel.read(is)) {
+        result = reader.resolve(ExcelReadContext.<Person>builder()
+                .clazz(Person.class)
+                .build());
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    final List<Person> data = result.getData();
+    System.out.println(join(data));
+    List<ExcelImportError> errorList = result.getErrors();
+    System.out.println(join(errorList));
+    assertThat(data)
+            .hasSize(count);
+}
 ```
 
 ### 多张表+自定义 header
@@ -108,62 +165,62 @@ public class UserWithAnnotation {
 **export**: 导出
 
 ```java
- @Test
-  public void testCustom() {
-    List<UserWithAnnotation> users = mockUserWithAnnotation(5);
-    EasyExcel.export("/tmp/test.xlsx")
-        .export(ExcelWriteContext.builder()
-            .datasource(users)
-            .sheetName("user1")
-            .createSheetHook((sheet, context) -> {
-              Row row = sheet.createRow(0);
-              sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 2));
-              Cell cell = row.createCell(0);
-              cell.setCellValue("custom header");
-            })
-            .startRow(1)
-            .build())
-        .export(ExcelWriteContext.builder()
-            .datasource(users)
-            .sheetName("user2")
-            .build())
-        .write();
-  }
+@Test
+public void testCustom() {
+  List<UserWithAnnotation> users = mockUserWithAnnotation(5);
+  EasyExcel.export("/tmp/test.xlsx")
+      .export(ExcelWriteContext.builder()
+          .datasource(users)
+          .sheetName("user1")
+          .createSheetHook((sheet, context) -> {
+            Row row = sheet.createRow(0);
+            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 2));
+            Cell cell = row.createCell(0);
+            cell.setCellValue("custom header");
+          })
+          .startRow(1)
+          .build())
+      .export(ExcelWriteContext.builder()
+          .datasource(users)
+          .sheetName("user2")
+          .build())
+      .write();
+}
 ```
 
 **import**: 导入
 
 ```java
- @Test
-  public void testCustom() {
-    InputStream inputStream = SimpleExcelReaderTest.class
-        .getClassLoader().getResourceAsStream("user3.xlsx");
-    ExcelReader reader = EasyExcel.read(inputStream);
+@Test
+public void testCustom() {
+  InputStream inputStream = SimpleExcelReaderTest.class
+      .getClassLoader().getResourceAsStream("user3.xlsx");
+  ExcelReader reader = EasyExcel.read(inputStream);
 
-    List<UserWithAnnotation> sheet1Result = reader.resolve(ExcelReadContext.<UserWithAnnotation>builder()
-        .clazz(UserWithAnnotation.class)
-        .headerStart(1)
-        .sheetIndex(0)
-        .readSheetHook((sheet, context) -> {
-          Row row = sheet.getRow(0);
-          Assert.assertEquals(row.getCell(0).getStringCellValue(), "custom header");
-        })
-        .build())
-        .getData();
+  List<UserWithAnnotation> sheet1Result = reader.resolve(ExcelReadContext.<UserWithAnnotation>builder()
+      .clazz(UserWithAnnotation.class)
+      .headerStart(1)
+      .sheetIndex(0)
+      .readSheetHook((sheet, context) -> {
+        Row row = sheet.getRow(0);
+        Assert.assertEquals(row.getCell(0).getStringCellValue(), "custom header");
+      })
+      .build())
+      .getData();
 
-    Assert.assertEquals(sheet1Result.size(), 5);
-    Assert.assertEquals(sheet1Result.get(1).getUsername(), "张三1");
+  Assert.assertEquals(sheet1Result.size(), 5);
+  Assert.assertEquals(sheet1Result.get(1).getUsername(), "张三1");
 
 
-    List<UserWithAnnotation> sheet2Result = reader.resolve(ExcelReadContext.<UserWithAnnotation>builder()
-        .clazz(UserWithAnnotation.class)
-        .sheetIndex(1)
-        .build());
+  List<UserWithAnnotation> sheet2Result = reader.resolve(ExcelReadContext.<UserWithAnnotation>builder()
+      .clazz(UserWithAnnotation.class)
+      .sheetIndex(1)
+      .build());
 
-    Assert.assertEquals(sheet2Result.size(), 5);
-    Assert.assertEquals(sheet2Result.get(1).getUsername(), "张三1");
+  Assert.assertEquals(sheet2Result.size(), 5);
+  Assert.assertEquals(sheet2Result.get(1).getUsername(), "张三1");
 
-  }
+}
 ```
 
 ### 写入 HttpServletResponse
