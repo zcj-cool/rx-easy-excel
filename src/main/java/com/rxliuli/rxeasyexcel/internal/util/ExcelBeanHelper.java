@@ -9,6 +9,8 @@ import com.rxliuli.rxeasyexcel.domain.convert.ConverterFactory;
 import com.rxliuli.rxeasyexcel.domain.convert.IConverter;
 import com.rxliuli.rxeasyexcel.domain.convert.NotSpecifyConverter;
 import com.rxliuli.rxeasyexcel.domain.select.SelectMapFactory;
+import com.rxliuli.rxeasyexcel.internal.util.tuple.Tuple;
+import com.rxliuli.rxeasyexcel.internal.util.tuple.Tuple3;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 
@@ -63,10 +65,10 @@ public class ExcelBeanHelper {
                 .filter(x -> Objects.isNull(x.getAnnotation(ExcelIgnore.class)))
                 .sorted(Comparator.comparing(x -> x.getAnnotation(ExcelField.class).order()))
                 .map(x -> {
-                    final Triple<String, ? extends IConverter, ExcelField> triple = castHeaderNameAndConverter(x);
-                    return new Pair<>(x.getName(), ExcelWriterHeader.create(triple.getLeft(), triple.getMiddle(), SelectMapFactory.get(triple.getRight().select()), triple.getRight().type(), triple.getRight().prompt()));
+                    final Tuple3<String, ? extends IConverter, ExcelField> triple = castHeaderNameAndConverter(x);
+                    return Tuple.of(x.getName(), ExcelWriterHeader.create(triple.getV1(), triple.getV2(), SelectMapFactory.get(triple.getV3().select()), triple.getV3().type(), triple.getV3().prompt()));
                 })
-                .collect(LinkedHashMap::new, (l, v) -> l.put(v.getKey(), v.getValue()), HashMap::putAll);
+                .collect(LinkedHashMap::new, (l, v) -> l.put(v.getV1(), v.getV2()), HashMap::putAll);
     }
 
     /**
@@ -84,19 +86,19 @@ public class ExcelBeanHelper {
                 .filter(x -> Objects.isNull(x.getAnnotation(ExcelIgnore.class)))
                 .sorted(Comparator.comparing(x -> x.getAnnotation(ExcelField.class).order()))
                 .map(x -> {
-                    final Triple<String, ? extends IConverter, ExcelField> triple = castHeaderNameAndConverter(x);
-                    return new Pair<>(triple.getLeft(), ExcelReadHeader.create(x, triple.getMiddle(), SelectMapFactory.get(triple.getRight().select()), triple.getRight().type()));
+                    final Tuple3<String, ? extends IConverter<Object>, ExcelField> triple = castHeaderNameAndConverter(x);
+                    return Tuple.of(triple.getV1(), ExcelReadHeader.create(x, triple.getV2(), SelectMapFactory.get(triple.getV3().select()), triple.getV3().type()));
                 })
-                .collect(HashMap::new, (l, v) -> l.put(v.getKey(), v.getValue()), HashMap::putAll);
+                .collect(HashMap::new, (l, v) -> l.put(v.getV1(), v.getV2()), HashMap::putAll);
     }
 
     /**
      * 从字段中获取到对应的表头名字与转换器
      *
      * @param field 字段
-     * @return 使用 {@link Pair} 封装的两个字段
+     * @return 使用 {@link Tuple3} 封装的两个字段
      */
-    private static Triple<String, ? extends IConverter, ExcelField> castHeaderNameAndConverter(Field field) {
+    private static Tuple3<String, ? extends IConverter<Object>, ExcelField> castHeaderNameAndConverter(Field field) {
         field.setAccessible(true);
         ExcelField excelField = field.getAnnotation(ExcelField.class);
         // 如果 convertClass 未指定，则根据字段类型获取对应的默认转换器
@@ -104,10 +106,10 @@ public class ExcelBeanHelper {
         if (NotSpecifyConverter.class.equals(convertClass)) {
             convertClass = ConverterFactory.get(field.getType());
         }
-        final IConverter<?> convert = ConvertHelper.getConvert(convertClass);
+        final IConverter<Object> convert = ConvertHelper.getConvert(convertClass);
         final String columnName = excelField.columnName();
         final String name = StringUtils.isEmpty(columnName) ? field.getName() : columnName;
-        return Triple.of(name, convert, excelField);
+        return Tuple.of(name, convert, excelField);
     }
 
     /**
@@ -178,14 +180,14 @@ public class ExcelBeanHelper {
                 .map(x -> {
                     x.setAccessible(true);
                     try {
-                        return new Pair<>(x.getName(), x.get(bean));
+                        return Tuple.of(x.getName(), x.get(bean));
                     } catch (IllegalAccessException e) {
                         // do nothing
                     }
                     return null;
                 })
-                .filter(x -> x != null && !Objects.equals(x.getKey(), "this$0"))
-                .collect(HashMap::new, (l, v) -> l.put(v.getKey(), v.getValue()), HashMap::putAll);
+                .filter(x -> x != null && !Objects.equals(x.getV1(), "this$0"))
+                .collect(HashMap::new, (l, v) -> l.put(v.getV1(), v.getV2()), HashMap::putAll);
     }
 
 }

@@ -74,10 +74,10 @@ public class DefaultExcelWriter implements ExcelWriter {
             if (v.getType() == ExcelColumnType.SELECT) {
                 final Map<?, String> map = v.getSelectMap();
             }
-            final Comment comment = createComment(drawing, v.getPrompt());
+//            final Comment comment = createComment(drawing, v.getPrompt());
             Cell cell = headerRow.createCell(tempCol[0]++);
             cell.setCellValue(v.getName());
-            cell.setCellComment(comment);
+//            cell.setCellComment(comment);
         });
 
         // 写数据
@@ -122,6 +122,8 @@ public class DefaultExcelWriter implements ExcelWriter {
      * @return 批注
      */
     private Comment createComment(Drawing<?> drawing, String prompt) {
+        final CreationHelper factory = this.workbook.getCreationHelper();
+        final ClientAnchor anchor = factory.createClientAnchor();
         final Comment comment = drawing.createCellComment(this.workbook.getCreationHelper().createClientAnchor());
         comment.setString(this.excelType == ExcelType.XLSX ? new XSSFRichTextString(prompt) : new HSSFRichTextString(prompt));
         return comment;
