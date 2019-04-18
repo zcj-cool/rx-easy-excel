@@ -9,8 +9,10 @@ import com.rxliuli.rxeasyexcel.domain.select.ExcelColumnType;
 import com.rxliuli.rxeasyexcel.internal.util.Assert;
 import com.rxliuli.rxeasyexcel.internal.util.ExcelBeanHelper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,7 @@ import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Quding Ding
@@ -65,7 +68,7 @@ public class DefaultExcelWriter implements ExcelWriter {
 
         // 写表头
         Row headerRow = sheet.createRow(startRow++);
-        int[] tempCol = {0};
+        final AtomicInteger tempCol = new AtomicInteger(0);
         LinkedHashMap<String, ExcelWriterHeader> headers = context.getHeaders();
         // 绘图对象
         final Drawing<?> drawing = sheet.createDrawingPatriarch();
@@ -74,18 +77,22 @@ public class DefaultExcelWriter implements ExcelWriter {
             if (v.getType() == ExcelColumnType.SELECT) {
                 final Map<?, String> map = v.getSelectMap();
             }
-//            final Comment comment = createComment(drawing, v.getPrompt());
-            Cell cell = headerRow.createCell(tempCol[0]++);
+            Cell cell = headerRow.createCell(tempCol.getAndIncrement());
             cell.setCellValue(v.getName());
-//            cell.setCellComment(comment);
+            // 批注
+            final String prompt = v.getPrompt();
+            if (StringUtils.isNotEmpty(prompt)) {
+                final Comment comment = createComment(drawing, prompt, cell.getRowIndex(), cell.getColumnIndex());
+                cell.setCellComment(comment);
+            }
         });
 
         // 写数据
         for (Map<String, Object> rowData : context.getDatasource()) {
             Row row = sheet.createRow(startRow++);
-            tempCol[0] = 0;
+            tempCol.set(0);
             headers.forEach((k, v) -> {
-                Cell cell = row.createCell(tempCol[0]++);
+                Cell cell = row.createCell(tempCol.getAndIncrement());
                 Object value = rowData.get(k);
                 ExcelBeanHelper.autoFitCell(cell, value == null ? null : v.getConvert().to(value));
             });
@@ -94,24 +101,18 @@ public class DefaultExcelWriter implements ExcelWriter {
 
         // 写错误数据
         final List<ExcelImportError> errors = context.getErrors();
-        errors.forEach(error -> createCell(sheet, drawing, error));
+        errors.forEach(error -> {
+            final Cell cell = sheet.getRow(error.getRow()).getCell(error.getCol());
+            final CellStyle style = this.createErrorCellStyle();
+            cell.setCellValue(error.getVal());
+            cell.setCellStyle(style);
+            // 错误批注
+            if (StringUtils.isNotEmpty(error.getMsg())) {
+                final Comment comment = createComment(drawing, error.getMsg(), cell.getRowIndex(), cell.getColumnIndex());
+                cell.setCellComment(comment);
+            }
+        });
         return this;
-    }
-
-    /**
-     * 创建一个单元格
-     *
-     * @param sheet   当前片区
-     * @param drawing 绘图对象
-     * @param error   错误信息
-     */
-    private void createCell(Sheet sheet, Drawing<?> drawing, ExcelImportError error) {
-        final Cell cell = sheet.getRow(error.getRow()).getCell(error.getCol());
-        final CellStyle style = this.createErrorCellStyle();
-        cell.setCellValue(error.getVal());
-        cell.setCellStyle(style);
-        final Comment comment = createComment(drawing, error.getMsg());
-        cell.setCellComment(comment);
     }
 
     /**
@@ -121,13 +122,15 @@ public class DefaultExcelWriter implements ExcelWriter {
      * @param prompt  提示信息
      * @return 批注
      */
-    private Comment createComment(Drawing<?> drawing, String prompt) {
-        final CreationHelper factory = this.workbook.getCreationHelper();
-        final ClientAnchor anchor = factory.createClientAnchor();
-        final Comment comment = drawing.createCellComment(this.workbook.getCreationHelper().createClientAnchor());
+    private Comment createComment(Drawing<?> drawing, String prompt, int row, int col) {
+        final Comment comment = drawing.createCellComment(this.excelType == ExcelType.XLSX
+                ? new XSSFClientAnchor(0, 0, 0, 0, col + 3, row + 3, col + 5, row + 8)
+                : new HSSFClientAnchor(0, 0, 0, 0, (short) (col + 3), row + 3, (short) (col + 5), row + 8)
+        );
         comment.setString(this.excelType == ExcelType.XLSX ? new XSSFRichTextString(prompt) : new HSSFRichTextString(prompt));
         return comment;
     }
+
 
     /**
      * 获取错误样式
