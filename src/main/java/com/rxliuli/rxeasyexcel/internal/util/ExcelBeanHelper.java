@@ -17,6 +17,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 导表过程中对Bean的一些处理
@@ -58,12 +59,7 @@ public class ExcelBeanHelper {
     @SuppressWarnings("unchecked")
     public static <T> LinkedHashMap<String, ExcelWriterHeader> beanToWriterHeaders(T bean) {
         // 为bean情况 获取到所有字段
-        return SuperClassUtil.getAllDeclaredField(bean.getClass()).stream()
-                // 过滤掉没有使用 ExcelField 注解指定的字段
-                .filter(x -> x.getAnnotation(ExcelField.class) != null)
-                // 过滤掉指定忽略的字段
-                .filter(x -> Objects.isNull(x.getAnnotation(ExcelIgnore.class)))
-                .sorted(Comparator.comparing(x -> x.getAnnotation(ExcelField.class).order()))
+        return getSortedFieldStream(bean.getClass())
                 .map(x -> {
                     final Tuple3<String, ? extends IConverter, ExcelField> triple = castHeaderNameAndConverter(x);
                     return Tuple.of(x.getName(), ExcelWriterHeader.create(triple.getV1(), triple.getV2(), SelectMapFactory.get(triple.getV3().select()), triple.getV3().type(), triple.getV3().prompt()));
@@ -79,17 +75,21 @@ public class ExcelBeanHelper {
      * @return 读操作header, key columnName value ExcelReadHeader
      */
     public static <T> Map<String, ExcelReadHeader> beanToReaderHeaders(Class<T> clazz) {
-        return SuperClassUtil.getAllDeclaredField(clazz).stream()
-                // 过滤掉没有使用 ExcelField 注解指定的字段
-                .filter(x -> x.getAnnotation(ExcelField.class) != null)
-                // 过滤掉指定忽略的字段
-                .filter(x -> Objects.isNull(x.getAnnotation(ExcelIgnore.class)))
-                .sorted(Comparator.comparing(x -> x.getAnnotation(ExcelField.class).order()))
+        return getSortedFieldStream(clazz)
                 .map(x -> {
                     final Tuple3<String, ? extends IConverter<Object>, ExcelField> tuple3 = castHeaderNameAndConverter(x);
                     return Tuple.of(tuple3.getV1(), ExcelReadHeader.create(x, tuple3.getV2(), SelectMapFactory.getReverse(tuple3.getV3().select()), tuple3.getV3().type()));
                 })
                 .collect(HashMap::new, (l, v) -> l.put(v.getV1(), v.getV2()), HashMap::putAll);
+    }
+
+    private static <T> Stream<Field> getSortedFieldStream(Class<T> clazz) {
+        return SuperClassUtil.getAllDeclaredField(clazz).stream()
+                // 过滤掉没有使用 ExcelField 注解指定的字段
+                .filter(x -> x.getAnnotation(ExcelField.class) != null)
+                // 过滤掉指定忽略的字段
+                .filter(x -> Objects.isNull(x.getAnnotation(ExcelIgnore.class)))
+                .sorted(Comparator.comparing(x -> x.getAnnotation(ExcelField.class).order()));
     }
 
     /**
@@ -173,10 +173,7 @@ public class ExcelBeanHelper {
      * @return map key is bean filed name,value is the filed value
      */
     private static <T> Map<String, Object> toMap(T bean) {
-        // 获取到所有字段
-        final Class<?> beanClass = bean.getClass();
-        final Field[] fields = beanClass.getDeclaredFields();
-        return Arrays.stream(fields)
+        return getSortedFieldStream(bean.getClass())
                 .map(x -> {
                     x.setAccessible(true);
                     try {
