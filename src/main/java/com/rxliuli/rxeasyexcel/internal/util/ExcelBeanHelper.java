@@ -59,7 +59,20 @@ public class ExcelBeanHelper {
     @SuppressWarnings("unchecked")
     public static <T> LinkedHashMap<String, ExcelWriterHeader> beanToWriterHeaders(T bean) {
         // 为bean情况 获取到所有字段
-        return getSortedFieldStream(bean.getClass())
+        return beanToWriterHeaders(bean.getClass());
+    }
+
+    /**
+     * 通过bean拿到对应的excel header
+     *
+     * @param clazz class 类型
+     * @param <T>   bean类型,支持LinkedHashMap 与 class
+     * @return LinkedHashMap key field name  value ExcelWriterHeader
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> LinkedHashMap<String, ExcelWriterHeader> beanToWriterHeaders(Class<?> clazz) {
+        // 为bean情况 获取到所有字段
+        return getSortedFieldStream(clazz)
                 .map(x -> {
                     final Tuple3<String, ? extends IConverter, ExcelField> triple = castHeaderNameAndConverter(x);
                     return Tuple.of(x.getName(), ExcelWriterHeader.create(triple.getV1(), triple.getV2(), SelectMapFactory.get(triple.getV3().select()), triple.getV3().type(), triple.getV3().prompt()));

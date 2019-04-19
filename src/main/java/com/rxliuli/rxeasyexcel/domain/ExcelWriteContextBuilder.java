@@ -1,6 +1,7 @@
 package com.rxliuli.rxeasyexcel.domain;
 
 import com.rxliuli.rxeasyexcel.internal.util.Assert;
+import com.rxliuli.rxeasyexcel.internal.util.ExcelBeanHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -44,6 +45,17 @@ public class ExcelWriteContextBuilder {
      */
     public ExcelWriteContextBuilder headers(LinkedHashMap<String, ExcelWriterHeader> headers) {
         this.context.setHeaders(headers);
+        return this;
+    }
+
+    /**
+     * 指定excel的header
+     *
+     * @param clazz header 对应的实体类
+     * @return this
+     */
+    public ExcelWriteContextBuilder headers(Class<?> clazz) {
+        this.context.setHeaders(ExcelBeanHelper.beanToWriterHeaders(clazz));
         return this;
     }
 
