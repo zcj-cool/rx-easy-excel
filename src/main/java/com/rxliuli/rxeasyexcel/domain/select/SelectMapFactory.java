@@ -3,7 +3,6 @@ package com.rxliuli.rxeasyexcel.domain.select;
 import com.rxliuli.rxeasyexcel.internal.util.MapUtil;
 import com.rxliuli.rxeasyexcel.internal.util.tuple.Tuple;
 import com.rxliuli.rxeasyexcel.internal.util.tuple.Tuple2;
-import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +77,7 @@ public class SelectMapFactory {
      *
      * @param clazz 类型
      */
-    public static void remove(Class<? extends ISelectMap<T>> clazz) {
+    public static void remove(Class<? extends ISelectMap<?>> clazz) {
         cacheMap.remove(clazz);
     }
 }
