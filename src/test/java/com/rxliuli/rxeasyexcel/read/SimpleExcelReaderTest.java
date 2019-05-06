@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class SimpleExcelReaderTest {
 
-    private final String currentPath = ExcelSelectTest.class.getClassLoader().getResource(".").getPath();
+    private final String currentPath = SimpleExcelReaderTest.class.getClassLoader().getResource(".").getPath();
     private String fileName = currentPath + "/ExcelSelectTest.xlsx";
 
     @Test
@@ -90,7 +90,8 @@ public class SimpleExcelReaderTest {
     }
 
     @Test
-    public void testRead4(){
+    public void testRead4() {
+        new ExcelSelectTest().excelExport();
         ExcelReader read = EasyExcel.read(fileName);
         List<ExcelSelectTest.Person> data = read.resolve(ExcelReadContext.<ExcelSelectTest.Person>builder().clazz(ExcelSelectTest.Person.class).build()).getData();
         System.out.println(data.toString());

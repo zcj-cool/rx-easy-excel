@@ -26,7 +26,7 @@ public class ExcelSelectTest {
     private String fileName = currentPath + "/ExcelSelectTest.xlsx";
 
     @Test
-    void excelExport() {
+    public void excelExport() {
         final List<Person> users = mockUser(count);
         EasyExcel.export(fileName)
                 .export(ExcelWriteContext.builder()
