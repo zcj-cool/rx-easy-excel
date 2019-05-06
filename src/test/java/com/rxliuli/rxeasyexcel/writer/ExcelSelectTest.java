@@ -20,7 +20,7 @@ import java.util.stream.IntStream;
 /**
  * @author rxliuli
  */
-class ExcelSelectTest {
+public class ExcelSelectTest {
     private final String currentPath = ExcelSelectTest.class.getClassLoader().getResource(".").getPath();
     private final int count = 5;
     private String fileName = currentPath + "/ExcelSelectTest.xlsx";
@@ -64,7 +64,7 @@ class ExcelSelectTest {
         private LocalDate localDate;
         @ExcelField(columnName = "本地时间", order = 4)
         private LocalTime localTime;
-        @ExcelField(columnName = "性别", order = 5, type = ExcelColumnType.SELECT, select = PersonSelect.UsernameMap.class)
+        @ExcelField(columnName = "性别", order = 5, type = ExcelColumnType.SELECT, selectClassName = "com.rxliuli.rxeasyexcel.writer.ExcelSelectTest$PersonSelect$UsernameMap")
         private Integer gender;
 
         public Person() {

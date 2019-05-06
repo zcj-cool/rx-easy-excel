@@ -5,6 +5,7 @@ import com.rxliuli.rxeasyexcel.domain.ExcelReadContext;
 import com.rxliuli.rxeasyexcel.model.Id;
 import com.rxliuli.rxeasyexcel.model.User;
 import com.rxliuli.rxeasyexcel.model.UserWithAnnotation;
+import com.rxliuli.rxeasyexcel.writer.ExcelSelectTest;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -17,6 +18,8 @@ import java.util.List;
  */
 public class SimpleExcelReaderTest {
 
+    private final String currentPath = ExcelSelectTest.class.getClassLoader().getResource(".").getPath();
+    private String fileName = currentPath + "/ExcelSelectTest.xlsx";
 
     @Test
     public void testRead() {
@@ -84,6 +87,14 @@ public class SimpleExcelReaderTest {
         Assert.assertEquals(1332, result.size());
         Assert.assertTrue(!result.isEmpty());
         reader.close();
+    }
+
+    @Test
+    public void testRead4(){
+        ExcelReader read = EasyExcel.read(fileName);
+        List<ExcelSelectTest.Person> data = read.resolve(ExcelReadContext.<ExcelSelectTest.Person>builder().clazz(ExcelSelectTest.Person.class).build()).getData();
+        System.out.println(data.toString());
+
     }
 
 }

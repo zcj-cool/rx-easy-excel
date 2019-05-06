@@ -46,6 +46,12 @@ public @interface ExcelField {
     Class<? extends ISelectMap<?>> select() default DefaultSelectMap.class;
 
     /**
+     * 下拉框对应的数据提供类，默认为空字符串，为了解决循环依赖而生
+     * @return
+     */
+    String selectClassName() default "";
+
+    /**
      * 表头提示
      */
     String prompt() default "";
