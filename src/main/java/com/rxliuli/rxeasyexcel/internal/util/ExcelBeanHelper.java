@@ -27,6 +27,7 @@ import java.util.stream.Stream;
  */
 public class ExcelBeanHelper {
 
+    private static final String NULL_VAL = "";
     /**
      * bean转Map函数,支持使用自定义注解
      *
@@ -75,7 +76,8 @@ public class ExcelBeanHelper {
         return getSortedFieldStream(clazz)
                 .map(x -> {
                     final Tuple3<String, ? extends IConverter, ExcelField> triple = castHeaderNameAndConverter(x);
-                    return Tuple.of(x.getName(), ExcelWriterHeader.create(triple.getV1(), triple.getV2(), SelectMapFactory.get(triple.getV3().select()), triple.getV3().type(), triple.getV3().prompt()));
+                    Class selectClass = getSelectClass(triple);
+                    return Tuple.of(x.getName(), ExcelWriterHeader.create(triple.getV1(), triple.getV2(), SelectMapFactory.get(selectClass), triple.getV3().type(), triple.getV3().prompt()));
                 })
                 .collect(LinkedHashMap::new, (l, v) -> l.put(v.getV1(), v.getV2()), HashMap::putAll);
     }
@@ -91,9 +93,25 @@ public class ExcelBeanHelper {
         return getSortedFieldStream(clazz)
                 .map(x -> {
                     final Tuple3<String, ? extends IConverter<Object>, ExcelField> tuple3 = castHeaderNameAndConverter(x);
-                    return Tuple.of(tuple3.getV1(), ExcelReadHeader.create(x, tuple3.getV2(), SelectMapFactory.getReverse(tuple3.getV3().select()), tuple3.getV3().type()));
+                    Class selectClass = getSelectClass(tuple3);
+                    return Tuple.of(tuple3.getV1(), ExcelReadHeader.create(x, tuple3.getV2(), SelectMapFactory.getReverse(selectClass), tuple3.getV3().type()));
                 })
                 .collect(HashMap::new, (l, v) -> l.put(v.getV1(), v.getV2()), HashMap::putAll);
+    }
+
+    /**
+     * 获取下拉框获取数据类类型，优先处理字符串类类型
+     * @param tuple3
+     * @return
+     */
+    private static Class getSelectClass(Tuple3<String, ? extends IConverter, ExcelField> tuple3){
+        Class aClass = null;
+        try {
+            aClass = NULL_VAL.equals(tuple3.getV3().selectClassName())?tuple3.getV3().select():Class.forName(tuple3.getV3().selectClassName());
+        } catch (ClassNotFoundException e) {
+            aClass = tuple3.getV3().select();
+        }
+        return aClass;
     }
 
     private static <T> Stream<Field> getSortedFieldStream(Class<T> clazz) {
