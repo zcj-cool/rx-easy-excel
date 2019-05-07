@@ -20,8 +20,8 @@ public class ExcelWriteContextBuilder {
      */
     private ExcelWriteContext context;
 
-    public ExcelWriteContextBuilder() {
-        this.context = new ExcelWriteContext();
+    public ExcelWriteContextBuilder(boolean isTemplateExport) {
+        this.context = new ExcelWriteContext(isTemplateExport);
     }
 
     public <T> ExcelWriteContextBuilder datasource(List<T> datasource) {
@@ -55,7 +55,7 @@ public class ExcelWriteContextBuilder {
      * @return this
      */
     public ExcelWriteContextBuilder headers(Class<?> clazz) {
-        this.context.setHeaders(ExcelBeanHelper.beanToWriterHeaders(clazz));
+        this.context.setHeaders(ExcelBeanHelper.beanToWriterHeaders(clazz, this.context));
         return this;
     }
 
@@ -74,7 +74,6 @@ public class ExcelWriteContextBuilder {
         this.context.setCreateSheetHook(createSheetHook);
         return this;
     }
-
 
     public ExcelWriteContextBuilder startRow(int startRow) {
         this.context.setStartRow(startRow);

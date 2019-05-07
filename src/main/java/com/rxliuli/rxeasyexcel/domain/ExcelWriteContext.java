@@ -35,14 +35,28 @@ public class ExcelWriteContext {
      */
     private int startRow = 0;
 
+    private boolean isTemplateExport;
+
     private String sheetName;
     /**
      * 错误列表
      */
     private List<ExcelImportError> errors = Collections.emptyList();
 
+    public ExcelWriteContext(boolean isTemplateExport) {
+        this.isTemplateExport = isTemplateExport;
+    }
+
+    public boolean isTemplateExport() {
+        return isTemplateExport;
+    }
+
     public static ExcelWriteContextBuilder builder() {
-        return new ExcelWriteContextBuilder();
+        return new ExcelWriteContextBuilder(false);
+    }
+
+    public static ExcelWriteContextBuilder builder(boolean isTemplateExport) {
+        return new ExcelWriteContextBuilder(isTemplateExport);
     }
 
     // package set
@@ -71,7 +85,7 @@ public class ExcelWriteContext {
      * @param bean bean
      */
     <T> ExcelWriteContext setHeaders(T bean) {
-        this.headers = ExcelBeanHelper.beanToWriterHeaders(bean);
+        this.headers = ExcelBeanHelper.beanToWriterHeaders(bean, this);
         return this;
     }
 
