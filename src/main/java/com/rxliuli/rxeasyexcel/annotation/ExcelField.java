@@ -60,4 +60,17 @@ public @interface ExcelField {
      * 错误消息，默认为 ""
      */
     String errMsg() default "";
+
+    /**
+     * 是否导出字段
+     *
+     * @return
+     */
+    boolean isExportField() default true;
+
+    /**
+     * 是否模板字段
+     */
+    boolean isTemplateField() default true;
+
 }

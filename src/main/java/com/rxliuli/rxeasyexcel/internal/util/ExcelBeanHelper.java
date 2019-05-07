@@ -4,6 +4,7 @@ import com.rxliuli.rxeasyexcel.ExcelException;
 import com.rxliuli.rxeasyexcel.annotation.ExcelField;
 import com.rxliuli.rxeasyexcel.annotation.ExcelIgnore;
 import com.rxliuli.rxeasyexcel.domain.ExcelReadHeader;
+import com.rxliuli.rxeasyexcel.domain.ExcelWriteContext;
 import com.rxliuli.rxeasyexcel.domain.ExcelWriterHeader;
 import com.rxliuli.rxeasyexcel.domain.convert.ConverterFactory;
 import com.rxliuli.rxeasyexcel.domain.convert.IConverter;
@@ -58,9 +59,9 @@ public class ExcelBeanHelper {
      * @return LinkedHashMap key field name  value ExcelWriterHeader
      */
     @SuppressWarnings("unchecked")
-    public static <T> LinkedHashMap<String, ExcelWriterHeader> beanToWriterHeaders(T bean) {
+    public static <T> LinkedHashMap<String, ExcelWriterHeader> beanToWriterHeaders(T bean, ExcelWriteContext context) {
         // 为bean情况 获取到所有字段
-        return beanToWriterHeaders(bean.getClass());
+        return beanToWriterHeaders(bean.getClass(), context);
     }
 
     /**
@@ -71,9 +72,9 @@ public class ExcelBeanHelper {
      * @return LinkedHashMap key field name  value ExcelWriterHeader
      */
     @SuppressWarnings("unchecked")
-    public static <T> LinkedHashMap<String, ExcelWriterHeader> beanToWriterHeaders(Class<?> clazz) {
+    public static <T> LinkedHashMap<String, ExcelWriterHeader> beanToWriterHeaders(Class<?> clazz, ExcelWriteContext context) {
         // 为bean情况 获取到所有字段
-        return getSortedFieldStream(clazz)
+        return getSortedFieldStream(clazz, context)
                 .map(x -> {
                     final Tuple3<String, ? extends IConverter, ExcelField> triple = castHeaderNameAndConverter(x);
                     Class selectClass = getSelectClass(triple);
@@ -115,11 +116,29 @@ public class ExcelBeanHelper {
     }
 
     private static <T> Stream<Field> getSortedFieldStream(Class<T> clazz) {
-        return SuperClassUtil.getAllDeclaredField(clazz).stream()
+        return getSortedFieldStream(clazz, null);
+    }
+
+    private static <T> Stream<Field> getSortedFieldStream(Class<T> clazz, ExcelWriteContext context) {
+        Stream<Field> fieldStream = SuperClassUtil.getAllDeclaredField(clazz).stream()
                 // 过滤掉没有使用 ExcelField 注解指定的字段
                 .filter(x -> x.getAnnotation(ExcelField.class) != null)
                 // 过滤掉指定忽略的字段
-                .filter(x -> Objects.isNull(x.getAnnotation(ExcelIgnore.class)))
+                .filter(x -> Objects.isNull(x.getAnnotation(ExcelIgnore.class)));
+
+        //导出过滤逻辑
+        if (context != null) {
+            //模板导出 忽略有标记isExportField为false的字段
+            if (context.isTemplateExport()) {
+                fieldStream = fieldStream.filter(x -> x.getAnnotation(ExcelField.class).isExportField());
+
+            } else {
+                //非模板导出 忽略有标记isTemplateField为false的字段
+                fieldStream = fieldStream.filter(x -> x.getAnnotation(ExcelField.class).isTemplateField());
+            }
+
+        }
+        return fieldStream
                 .sorted(Comparator.comparing(x -> x.getAnnotation(ExcelField.class).order()));
     }
 
