@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 
 import java.lang.reflect.Field;
-import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -202,6 +201,15 @@ public class ExcelBeanHelper {
             case FORMULA:
             case BLANK:
                 return cell.getStringCellValue();
+            case NUMERIC:
+                final double value = cell.getNumericCellValue();
+                Object res = value;
+                if (value == (int) value) {
+                    res = (int) value;
+                }
+                return Objects.toString(res);
+            case BOOLEAN:
+                return Objects.toString(cell.getBooleanCellValue());
             case _NONE:
             case ERROR:
             default:
