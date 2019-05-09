@@ -7,15 +7,25 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
-public class ExcelWriteTest {
+class ExcelWriteTest {
     private final String currentPath = ExcelSelectTest.class.getClassLoader().getResource(".").getPath();
-    private String fileName = currentPath + "/ExcelTemplateTest.xlsx";
 
     @Test
-    public void excelTemplateTest() {
+    void excelTemplateTest() {
         EasyExcel
-                .export(fileName)
+                .export(currentPath + "/ExcelWriteTemplateTest.xlsx")
                 .export(ExcelWriteContext.builder(true)
+                        .headers(Car.class)
+                        .datasource(Collections.emptyList())
+                        .build()
+                ).write();
+    }
+
+    @Test
+    void excelDataTest() {
+        EasyExcel
+                .export(currentPath + "/ExcelWriteDataTest.xlsx")
+                .export(ExcelWriteContext.builder(false)
                         .headers(Car.class)
                         .datasource(Collections.emptyList())
                         .build()

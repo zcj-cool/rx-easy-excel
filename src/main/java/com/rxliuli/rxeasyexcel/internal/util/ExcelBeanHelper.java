@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 public class ExcelBeanHelper {
 
     private static final String NULL_VAL = "";
+
     /**
      * bean转Map函数,支持使用自定义注解
      *
@@ -102,13 +103,14 @@ public class ExcelBeanHelper {
 
     /**
      * 获取下拉框获取数据类类型，优先处理字符串类类型
+     *
      * @param tuple3
      * @return
      */
-    private static Class getSelectClass(Tuple3<String, ? extends IConverter, ExcelField> tuple3){
+    private static Class getSelectClass(Tuple3<String, ? extends IConverter, ExcelField> tuple3) {
         Class aClass = null;
         try {
-            aClass = NULL_VAL.equals(tuple3.getV3().selectClassName())?tuple3.getV3().select():Class.forName(tuple3.getV3().selectClassName());
+            aClass = NULL_VAL.equals(tuple3.getV3().selectClassName()) ? tuple3.getV3().select() : Class.forName(tuple3.getV3().selectClassName());
         } catch (ClassNotFoundException e) {
             aClass = tuple3.getV3().select();
         }
@@ -120,25 +122,16 @@ public class ExcelBeanHelper {
     }
 
     private static <T> Stream<Field> getSortedFieldStream(Class<T> clazz, ExcelWriteContext context) {
-        Stream<Field> fieldStream = SuperClassUtil.getAllDeclaredField(clazz).stream()
+        return SuperClassUtil.getAllDeclaredField(clazz).stream()
                 // 过滤掉没有使用 ExcelField 注解指定的字段
                 .filter(x -> x.getAnnotation(ExcelField.class) != null)
                 // 过滤掉指定忽略的字段
-                .filter(x -> Objects.isNull(x.getAnnotation(ExcelIgnore.class)));
-
-        //导出过滤逻辑
-        if (context != null) {
-            //模板导出 忽略有标记isExportField为false的字段
-            if (context.isTemplateExport()) {
-                fieldStream = fieldStream.filter(x -> x.getAnnotation(ExcelField.class).isExportField());
-
-            } else {
-                //非模板导出 忽略有标记isTemplateField为false的字段
-                fieldStream = fieldStream.filter(x -> x.getAnnotation(ExcelField.class).isTemplateField());
-            }
-
-        }
-        return fieldStream
+                .filter(x -> Objects.isNull(x.getAnnotation(ExcelIgnore.class)))
+                //导出过滤逻辑
+                .filter(x -> context == null
+                        || (context.isTemplateExport() && x.getAnnotation(ExcelField.class).isTemplateField())
+                        || (!context.isTemplateExport() && x.getAnnotation(ExcelField.class).isExportField())
+                )
                 .sorted(Comparator.comparing(x -> x.getAnnotation(ExcelField.class).order()));
     }
 
