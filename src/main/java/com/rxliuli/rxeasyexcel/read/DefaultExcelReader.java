@@ -7,6 +7,7 @@ import com.rxliuli.rxeasyexcel.domain.ExcelReadContext;
 import com.rxliuli.rxeasyexcel.domain.ExcelReadHeader;
 import com.rxliuli.rxeasyexcel.domain.ImportDomain;
 import com.rxliuli.rxeasyexcel.internal.util.ExcelBeanHelper;
+import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Quding Ding
@@ -61,8 +63,11 @@ public class DefaultExcelReader implements ExcelReader {
         List<T> resultContainer = new ArrayList<>(totalCount);
         Map<String, ExcelReadHeader> configHeaders = context.getHeaders();
         final LinkedList<ExcelImportError> errorList = new LinkedList<>();
-
+        final LinkedMap<String, Integer> columnInfoMap = new LinkedMap<>();
         // 依次解析每一行
+
+        //添加列信息，只添加一次
+        final AtomicInteger colAddNum = new AtomicInteger(0);
         for (; startRow <= lastRowNum; startRow++) {
             Row row = sheet.getRow(startRow);
             T instance = ExcelBeanHelper.newInstance(context.getClazz());
@@ -77,6 +82,10 @@ public class DefaultExcelReader implements ExcelReader {
                 }
                 Object value = null;
                 final Field field = tempHeader.getField();
+                //添加列信息
+                if (colAddNum.get() == 0) {
+                    columnInfoMap.put(field.getName(), columnIndex);
+                }
                 final ExcelField excelField = field.getAnnotation(ExcelField.class);
                 try {
                     switch (tempHeader.getType()) {
@@ -96,10 +105,10 @@ public class DefaultExcelReader implements ExcelReader {
                 }
                 ExcelBeanHelper.fieldSetValue(field, instance, value);
             });
-
+            colAddNum.incrementAndGet();
             resultContainer.add(instance);
         }
-        return new ImportDomain<>(resultContainer, errorList);
+        return new ImportDomain<>(resultContainer, errorList, columnInfoMap);
     }
 
 

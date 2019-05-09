@@ -2,6 +2,7 @@ package com.rxliuli.rxeasyexcel.read;
 
 import com.rxliuli.rxeasyexcel.EasyExcel;
 import com.rxliuli.rxeasyexcel.domain.ExcelReadContext;
+import com.rxliuli.rxeasyexcel.domain.ImportDomain;
 import com.rxliuli.rxeasyexcel.model.UserWithAnnotation;
 import org.apache.poi.ss.usermodel.Row;
 import org.junit.Assert;
@@ -9,6 +10,8 @@ import org.junit.Test;
 
 import java.io.InputStream;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Quding Ding
@@ -43,6 +46,11 @@ public class CustomExcelReadExample1Test {
                 .build())
                 .getData();
 
+        ImportDomain<UserWithAnnotation> resolve = reader.resolve(ExcelReadContext.<UserWithAnnotation>builder()
+                .clazz(UserWithAnnotation.class)
+                .sheetIndex(1)
+                .build());
+        assertThat(resolve.getColumnInfoMap()).isNotEmpty();
         Assert.assertEquals(sheet2Result.size(), 5);
         Assert.assertEquals(sheet2Result.get(1).getUsername(), "张三1");
 
