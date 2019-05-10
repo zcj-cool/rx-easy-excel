@@ -138,10 +138,10 @@ public class DefaultExcelWriter implements ExcelWriter {
             cell.setCellValue(error.getVal());
             cell.setCellStyle(style);
             // 错误批注
-//            if (StringUtils.isNotEmpty(error.getMsg())) {
-//                final Comment comment = createComment(drawing, error.getMsg(), cell.getRowIndex(), cell.getColumnIndex());
-//                cell.setCellComment(comment);
-//            }
+            if (StringUtils.isNotEmpty(error.getMsg())) {
+                final Comment comment = createComment(drawing, error.getMsg(), cell.getRowIndex(), cell.getColumnIndex());
+                cell.setCellComment(comment);
+            }
         });
         return this;
     }
