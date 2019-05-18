@@ -92,7 +92,8 @@ public class DefaultExcelWriter implements ExcelWriter {
                 selectTupleList.push(Tuple.of(v.getSelectMap().values().toArray(new String[]{}), cell.getColumnIndex()));
             }
             //设置宽度自适应
-            sheet.autoSizeColumn(cell.getColumnIndex());
+            int columnIndex = cell.getColumnIndex();
+            ExcelBeanHelper.autoColumnWidth(sheet, columnIndex);
         });
 
         // 下拉框设置

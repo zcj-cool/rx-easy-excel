@@ -14,6 +14,7 @@ import com.rxliuli.rxeasyexcel.internal.util.tuple.Tuple;
 import com.rxliuli.rxeasyexcel.internal.util.tuple.Tuple3;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Sheet;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -239,4 +240,8 @@ public class ExcelBeanHelper {
                 .collect(HashMap::new, (l, v) -> l.put(v.getV1(), v.getV2()), HashMap::putAll);
     }
 
+    public static void autoColumnWidth(Sheet sheet, int columnIndex) {
+        sheet.autoSizeColumn(columnIndex);
+        sheet.setColumnWidth(columnIndex, sheet.getColumnWidth(columnIndex) * 17 / 10);
+    }
 }
