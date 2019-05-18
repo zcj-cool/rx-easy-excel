@@ -91,6 +91,8 @@ public class DefaultExcelWriter implements ExcelWriter {
             if (v.getType() == ExcelColumnType.SELECT) {
                 selectTupleList.push(Tuple.of(v.getSelectMap().values().toArray(new String[]{}), cell.getColumnIndex()));
             }
+            //设置宽度自适应
+            sheet.autoSizeColumn(cell.getColumnIndex());
         });
 
         // 下拉框设置

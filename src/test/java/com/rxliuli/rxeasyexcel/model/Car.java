@@ -3,7 +3,7 @@ package com.rxliuli.rxeasyexcel.model;
 import com.rxliuli.rxeasyexcel.annotation.ExcelField;
 
 public class Car {
-    @ExcelField(columnName = "车名", order = 1)
+    @ExcelField(columnName = "车名111111111111111111111", order = 1)
     private String name;
 
     @ExcelField(columnName = "ID", order = 1, isTemplateField = false)
