@@ -1,6 +1,7 @@
 package com.rxliuli.rxeasyexcel.domain.convert;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
@@ -29,6 +30,6 @@ public class LocalDateTimeConverter implements IConverter<LocalDateTime> {
 
     @Override
     public LocalDateTime from(String s) {
-        return LocalDateTime.parse(s, LOCAL_DATE_TIME_FORMATTER_FOR_SPACE_SEPARATED);
+        return LocalDateTime.ofEpochSecond(Long.valueOf(s) / 1000, 0, ZoneOffset.ofHours(8));
     }
 }

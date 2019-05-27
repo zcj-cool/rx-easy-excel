@@ -1,6 +1,8 @@
 package com.rxliuli.rxeasyexcel.domain.convert;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -16,6 +18,6 @@ public class LocalDateConverter implements IConverter<LocalDate> {
 
     @Override
     public LocalDate from(String s) {
-        return LocalDate.parse(s, DATE_FORMAT);
+        return Instant.ofEpochMilli(Long.valueOf(s)).atZone(ZoneId.systemDefault()).toLocalDate();
     }
 }

@@ -19,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -105,6 +106,12 @@ class ErrorImportTest {
         System.out.println(resolve);
     }
 
+    @Test
+    public void localTimeTest() {
+        LocalTime now = LocalTime.now();
+        System.out.println(now);
+    }
+
 
     private List<Person> mockUser(int count) {
         return IntStream.range(0, count)
@@ -173,10 +180,34 @@ class ErrorImportTest {
     }
 
     public static class Info {
-        @ExcelField(columnName = "测试下拉框", order = 5, type = ExcelColumnType.SELECT, select = ANumSelect.class)
+        //        @ExcelField(columnName = "测试下拉框", order = 5, type = ExcelColumnType.SELECT, select = ANumSelect.class)
         private Integer ANum;
 
+        //        @ExcelField(columnName = "日期", order = 5)
+        private LocalDateTime date;
+
+        @ExcelField(columnName = "时间", order = 5)
+        private LocalTime time;
+
         public Info() {
+        }
+
+        public LocalDateTime getDate() {
+            return date;
+        }
+
+        public Info setDate(LocalDateTime date) {
+            this.date = date;
+            return this;
+        }
+
+        public LocalTime getTime() {
+            return time;
+        }
+
+        public Info setTime(LocalTime time) {
+            this.time = time;
+            return this;
         }
 
         public Info(Integer ANum) {

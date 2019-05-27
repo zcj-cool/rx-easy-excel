@@ -13,6 +13,7 @@ import com.rxliuli.rxeasyexcel.domain.select.SelectMapFactory;
 import com.rxliuli.rxeasyexcel.internal.util.tuple.Tuple;
 import com.rxliuli.rxeasyexcel.internal.util.tuple.Tuple3;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -204,6 +205,11 @@ public class ExcelBeanHelper {
             case BLANK:
                 return cell.getStringCellValue();
             case NUMERIC:
+                //判断是否日期
+                if (HSSFDateUtil.isCellDateFormatted(cell)) {
+                    Date date = HSSFDateUtil.getJavaDate(cell.getNumericCellValue());
+                    return Objects.toString(date.getTime());
+                }
                 final double value = cell.getNumericCellValue();
                 Object res = value;
                 if (value == (int) value) {

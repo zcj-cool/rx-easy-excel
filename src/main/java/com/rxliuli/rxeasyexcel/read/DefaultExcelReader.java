@@ -18,6 +18,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -104,6 +105,10 @@ public class DefaultExcelReader implements ExcelReader {
                 } catch (NumberFormatException e) {
                     final String msg = excelField.errMsg();
                     errorList.add(new ExcelImportError(i, columnIndex, field.getName(), columnValue, e, StringUtils.isEmpty(msg) ? "请输入正确的数字" : msg));
+
+                } catch (DateTimeParseException e) {
+                    final String msg = excelField.errMsg();
+                    errorList.add(new ExcelImportError(i, columnIndex, field.getName(), columnValue, e, StringUtils.isEmpty(msg) ? "请输入正确的日期" : msg));
                 } catch (Exception e) {
                     // 如果解析错误则记录下来
                     final String msg = excelField.errMsg();
