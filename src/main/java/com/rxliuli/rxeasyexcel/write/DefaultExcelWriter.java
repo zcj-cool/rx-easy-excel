@@ -78,6 +78,7 @@ public class DefaultExcelWriter implements ExcelWriter {
         final LinkedList<Tuple2<String[], Integer>> selectTupleList = new LinkedList<>();
         // 绘图对象
         final Drawing<?> drawing = sheet.createDrawingPatriarch();
+        CellStyle headerStyle = getHeaderStyle();
         headers.forEach((k, v) -> {
             Cell cell = headerRow.createCell(tempCol.getAndIncrement());
             cell.setCellValue(v.getName());
@@ -94,6 +95,8 @@ public class DefaultExcelWriter implements ExcelWriter {
             //设置宽度自适应
             int columnIndex = cell.getColumnIndex();
             ExcelBeanHelper.autoColumnWidth(sheet, columnIndex);
+            //设置表头样式
+            cell.setCellStyle(headerStyle);
         });
 
         // 下拉框设置
@@ -147,6 +150,19 @@ public class DefaultExcelWriter implements ExcelWriter {
             }
         });
         return this;
+    }
+
+    /**
+     * 获取表头样式
+     */
+    private CellStyle getHeaderStyle() {
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        cellStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        Font font = workbook.createFont();
+        font.setBold(true);
+        cellStyle.setFont(font);
+        return cellStyle;
     }
 
     /**
@@ -208,4 +224,5 @@ public class DefaultExcelWriter implements ExcelWriter {
             }
         }
     }
+
 }

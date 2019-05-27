@@ -6,6 +6,8 @@ import com.rxliuli.rxeasyexcel.domain.ExcelImportError;
 import com.rxliuli.rxeasyexcel.domain.ExcelReadContext;
 import com.rxliuli.rxeasyexcel.domain.ExcelWriteContext;
 import com.rxliuli.rxeasyexcel.domain.ImportDomain;
+import com.rxliuli.rxeasyexcel.domain.select.ExcelColumnType;
+import com.rxliuli.rxeasyexcel.model.ANumSelect;
 import com.rxliuli.rxeasyexcel.writer.DateFieldTest;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.junit.jupiter.api.MethodOrderer;
@@ -19,6 +21,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -83,6 +86,26 @@ class ErrorImportTest {
                 .write();
     }
 
+    @Test
+    public void exportSelectFile() {
+        EasyExcel.export(currentPath + "SelectExportTest.xlsx")
+                .export(ExcelWriteContext.builder()
+                        .datasource(Collections.emptyList())
+                        .headers(Info.class)
+                        .build()
+                ).write();
+    }
+
+    @Test
+    public void importSelectFile() {
+        ImportDomain<Info> resolve = EasyExcel.read(currentPath + "SelectExportTest.xlsx")
+                .resolve(ExcelReadContext.<Info>builder()
+                        .clazz(Info.class)
+                        .build());
+        System.out.println(resolve);
+    }
+
+
     private List<Person> mockUser(int count) {
         return IntStream.range(0, count)
                 .mapToObj(i -> new Person("姓名 " + i, new Date(), LocalDate.now(), LocalTime.now()))
@@ -98,6 +121,8 @@ class ErrorImportTest {
         private LocalDate localDate;
         @ExcelField(columnName = "本地时间", order = 4)
         private LocalTime localTime;
+        @ExcelField(columnName = "测试下拉框", order = 5, type = ExcelColumnType.SELECT, select = ANumSelect.class)
+        private Integer ANum;
 
         public Person() {
         }
@@ -127,6 +152,15 @@ class ErrorImportTest {
             return this;
         }
 
+        public Integer getANum() {
+            return ANum;
+        }
+
+        public Person setANum(Integer ANum) {
+            this.ANum = ANum;
+            return this;
+        }
+
         @Override
         public String toString() {
             return new ToStringBuilder(this)
@@ -135,6 +169,27 @@ class ErrorImportTest {
                     .append("localDate", localDate)
                     .append("localTime", localTime)
                     .toString();
+        }
+    }
+
+    public static class Info {
+        @ExcelField(columnName = "测试下拉框", order = 5, type = ExcelColumnType.SELECT, select = ANumSelect.class)
+        private Integer ANum;
+
+        public Info() {
+        }
+
+        public Info(Integer ANum) {
+            this.ANum = ANum;
+        }
+
+        public Integer getANum() {
+            return ANum;
+        }
+
+        public Info setANum(Integer ANum) {
+            this.ANum = ANum;
+            return this;
         }
     }
 }

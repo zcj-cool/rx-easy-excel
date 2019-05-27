@@ -94,10 +94,16 @@ public class DefaultExcelReader implements ExcelReader {
                             break;
                         case SELECT:
                             value = tempHeader.getSelectMap().getOrDefault(columnValue, null);
+                            if (value == null || (value instanceof String && StringUtils.isEmpty((String) value))) {
+                                errorList.add(new ExcelImportError(i, columnIndex, field.getName(), columnValue, null, "请选择下拉框的值"));
+                            }
                             break;
                         default:
                             value = null;
                     }
+                } catch (NumberFormatException e) {
+                    final String msg = excelField.errMsg();
+                    errorList.add(new ExcelImportError(i, columnIndex, field.getName(), columnValue, e, StringUtils.isEmpty(msg) ? "请输入正确的数字" : msg));
                 } catch (Exception e) {
                     // 如果解析错误则记录下来
                     final String msg = excelField.errMsg();
