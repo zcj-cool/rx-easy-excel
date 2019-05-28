@@ -73,4 +73,10 @@ public @interface ExcelField {
      */
     boolean isTemplateField() default true;
 
+    /**
+     * 验证
+     * 值最大长度
+     */
+    int maxLength() default 500;
+
 }

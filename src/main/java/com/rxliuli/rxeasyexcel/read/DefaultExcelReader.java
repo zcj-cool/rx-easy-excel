@@ -19,10 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -92,6 +89,10 @@ public class DefaultExcelReader implements ExcelReader {
                     switch (tempHeader.getType()) {
                         case TEXT:
                             value = tempHeader.getConvert().from(columnValue);
+                            int maxLength = excelField.maxLength();
+                            if (Objects.toString(value).length() > maxLength) {
+                                errorList.add(new ExcelImportError(i, columnIndex, field.getName(), columnValue, null, "你输入的值超过" + maxLength + "字符，请重新输入"));
+                            }
                             break;
                         case SELECT:
                             value = tempHeader.getSelectMap().getOrDefault(columnValue, null);

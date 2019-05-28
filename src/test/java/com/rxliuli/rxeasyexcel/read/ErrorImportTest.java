@@ -186,10 +186,35 @@ class ErrorImportTest {
         //        @ExcelField(columnName = "日期", order = 5)
         private LocalDateTime date;
 
-        @ExcelField(columnName = "时间", order = 5)
+        //@ExcelField(columnName = "时间", order = 5)
         private LocalTime time;
 
+        @ExcelField(columnName = "名称", order = 5, maxLength = 10)
+        private String name;
+
+        @ExcelField(columnName = "年龄", maxLength = 3)
+        private Integer year;
+
+
         public Info() {
+        }
+
+        public Integer getYear() {
+            return year;
+        }
+
+        public Info setYear(Integer year) {
+            this.year = year;
+            return this;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Info setName(String name) {
+            this.name = name;
+            return this;
         }
 
         public LocalDateTime getDate() {
