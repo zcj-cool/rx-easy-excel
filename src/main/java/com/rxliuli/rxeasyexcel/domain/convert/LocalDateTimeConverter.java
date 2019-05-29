@@ -32,6 +32,10 @@ public class LocalDateTimeConverter implements IConverter<LocalDateTime> {
 
     @Override
     public LocalDateTime from(String s) {
-        return LocalDateTime.ofEpochSecond(Long.valueOf(s) / 1000, 0, ZoneOffset.ofHours(8));
+        try {
+            return LocalDateTime.ofEpochSecond(Long.valueOf(s) / 1000, 0, ZoneOffset.ofHours(8));
+        } catch (Exception e) {
+            return LocalDateTime.parse(s, LOCAL_DATE_TIME_FORMATTER_EXCEL);
+        }
     }
 }
