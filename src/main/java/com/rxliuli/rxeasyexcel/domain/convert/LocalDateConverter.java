@@ -10,10 +10,11 @@ import java.time.format.DateTimeFormatter;
  */
 public class LocalDateConverter implements IConverter<LocalDate> {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter DATE_FORMAT_EXCEL = DateTimeFormatter.ofPattern("yyyy/MM/dd");
 
     @Override
     public String to(LocalDate localDateTime) {
-        return DATE_FORMAT.format(localDateTime);
+        return DATE_FORMAT_EXCEL.format(localDateTime);
     }
 
     @Override

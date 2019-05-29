@@ -89,4 +89,13 @@ public class Car {
         this.voVal = voVal;
         return this;
     }
+
+    public LocalDateTime getEffectTime() {
+        return effectTime;
+    }
+
+    public Car setEffectTime(LocalDateTime effectTime) {
+        this.effectTime = effectTime;
+        return this;
+    }
 }

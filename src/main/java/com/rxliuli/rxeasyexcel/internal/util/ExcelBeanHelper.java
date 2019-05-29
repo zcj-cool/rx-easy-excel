@@ -18,6 +18,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.lang.reflect.Field;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -210,12 +211,11 @@ public class ExcelBeanHelper {
                     Date date = HSSFDateUtil.getJavaDate(cell.getNumericCellValue());
                     return Objects.toString(date.getTime());
                 }
-                final double value = cell.getNumericCellValue();
-                Object res = value;
-                if (value == (int) value) {
-                    res = (int) value;
-                }
-                return Objects.toString(res);
+//                Object res = value;
+//                if (value == (int) value) {
+//                    res = (int) value;
+//                }
+                return new DecimalFormat("#").format(cell.getNumericCellValue());
             case BOOLEAN:
                 return Objects.toString(cell.getBooleanCellValue());
             case _NONE:

@@ -180,7 +180,7 @@ class ErrorImportTest {
     }
 
     public static class Info {
-        //        @ExcelField(columnName = "测试下拉框", order = 5, type = ExcelColumnType.SELECT, select = ANumSelect.class)
+        @ExcelField(columnName = "测试下拉框", order = 5, type = ExcelColumnType.SELECT, select = ANumSelect.class)
         private Integer ANum;
 
         //        @ExcelField(columnName = "日期", order = 5)
@@ -189,14 +189,50 @@ class ErrorImportTest {
         //@ExcelField(columnName = "时间", order = 5)
         private LocalTime time;
 
-        @ExcelField(columnName = "名称", order = 5, maxLength = 10)
+        @ExcelField(columnName = "名称")
         private String name;
 
-        @ExcelField(columnName = "年龄", maxLength = 3)
+        //        @ExcelField(columnName = "年龄", maxLength = 3)
         private Integer year;
+
+        @ExcelField(columnName = "手机")
+        private String num;
+
+        @ExcelField(columnName = "类型")
+        private Integer type;
+
+        @ExcelField(columnName = "idcID")
+        private String idcId;
 
 
         public Info() {
+        }
+
+        public String getIdcId() {
+            return idcId;
+        }
+
+        public Info setIdcId(String idcId) {
+            this.idcId = idcId;
+            return this;
+        }
+
+        public Integer getType() {
+            return type;
+        }
+
+        public Info setType(Integer type) {
+            this.type = type;
+            return this;
+        }
+
+        public String getNum() {
+            return num;
+        }
+
+        public Info setNum(String num) {
+            this.num = num;
+            return this;
         }
 
         public Integer getYear() {

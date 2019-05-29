@@ -23,9 +23,11 @@ public class LocalDateTimeConverter implements IConverter<LocalDateTime> {
                     .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
                     .toFormatter();
 
+    private static final DateTimeFormatter LOCAL_DATE_TIME_FORMATTER_EXCEL = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+
     @Override
     public String to(LocalDateTime localDateTime) {
-        return LOCAL_DATE_TIME_FORMATTER_FOR_SPACE_SEPARATED.format(localDateTime);
+        return LOCAL_DATE_TIME_FORMATTER_EXCEL.format(localDateTime);
     }
 
     @Override
