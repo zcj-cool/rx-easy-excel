@@ -44,6 +44,7 @@ class ExcelWriteTest {
                         .headers(Car.class)
                         .datasource(Lists.newArrayList(
                                 new Car().setEffectTime(LocalDateTime.now())
+                                        .setName("23654")
                         ))
                         .build()
                 ).write();

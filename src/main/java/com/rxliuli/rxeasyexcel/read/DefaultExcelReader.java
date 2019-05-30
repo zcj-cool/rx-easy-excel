@@ -62,10 +62,19 @@ public class DefaultExcelReader implements ExcelReader {
         Map<String, ExcelReadHeader> configHeaders = context.getHeaders();
         final LinkedList<ExcelImportError> errorList = new LinkedList<>();
         final LinkedMap<String, Integer> columnInfoMap = new LinkedMap<>();
-        // 依次解析每一行
 
+        //获取列信息
         //添加列信息，只添加一次
         final AtomicInteger colAddNum = new AtomicInteger(0);
+        header.cellIterator().forEachRemaining(x -> {
+            final int columnIndex = x.getColumnIndex();
+            final ExcelReadHeader tempHeader = configHeaders.get(realHeaders.get(columnIndex));
+            final Field field = tempHeader.getField();
+            columnInfoMap.put(field.getName(), columnIndex);
+            colAddNum.incrementAndGet();
+        });
+
+        // 依次解析每一行
         for (; startRow <= lastRowNum; startRow++) {
             Row row = sheet.getRow(startRow);
             T instance = ExcelBeanHelper.newInstance(context.getClazz());
@@ -75,18 +84,11 @@ public class DefaultExcelReader implements ExcelReader {
                 final ExcelReadHeader tempHeader = configHeaders.get(realHeaders.get(columnIndex));
                 final String columnValue = ExcelBeanHelper.getColumnValue(x);
                 // 如果字段值为空字符串则直接跳过
-                if (null == tempHeader) {
+                if (null == tempHeader || StringUtils.isEmpty(columnValue)) {
                     return;
                 }
                 Object value = null;
                 final Field field = tempHeader.getField();
-                //添加列信息
-                if (colAddNum.get() == 0) {
-                    columnInfoMap.put(field.getName(), columnIndex);
-                }
-                if (StringUtils.isEmpty(columnValue)) {
-                    return;
-                }
                 final ExcelField excelField = field.getAnnotation(ExcelField.class);
                 try {
                     switch (tempHeader.getType()) {
@@ -120,7 +122,6 @@ public class DefaultExcelReader implements ExcelReader {
                 }
                 ExcelBeanHelper.fieldSetValue(field, instance, value);
             });
-            colAddNum.incrementAndGet();
             resultContainer.add(instance);
         }
         return new ImportDomain<>(resultContainer, errorList, columnInfoMap);
