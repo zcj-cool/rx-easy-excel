@@ -84,6 +84,9 @@ public class DefaultExcelReader implements ExcelReader {
                 if (colAddNum.get() == 0) {
                     columnInfoMap.put(field.getName(), columnIndex);
                 }
+                if (StringUtils.isEmpty(columnValue)) {
+                    return;
+                }
                 final ExcelField excelField = field.getAnnotation(ExcelField.class);
                 try {
                     switch (tempHeader.getType()) {
