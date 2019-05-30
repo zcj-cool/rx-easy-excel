@@ -75,7 +75,7 @@ public class DefaultExcelReader implements ExcelReader {
                 final ExcelReadHeader tempHeader = configHeaders.get(realHeaders.get(columnIndex));
                 final String columnValue = ExcelBeanHelper.getColumnValue(x);
                 // 如果字段值为空字符串则直接跳过
-                if (null == tempHeader || StringUtils.isEmpty(columnValue)) {
+                if (null == tempHeader) {
                     return;
                 }
                 Object value = null;
