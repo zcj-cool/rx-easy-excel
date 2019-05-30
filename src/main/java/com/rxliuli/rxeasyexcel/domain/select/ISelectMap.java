@@ -1,6 +1,6 @@
 package com.rxliuli.rxeasyexcel.domain.select;
 
-import java.util.Map;
+import com.rxliuli.rxeasyexcel.domain.base.BaseMap;
 
 /**
  * Select 下拉框接口
@@ -8,11 +8,6 @@ import java.util.Map;
  *
  * @author rxliuli
  */
-public interface ISelectMap<ColumnType> {
-    /**
-     * 获取到映射表
-     *
-     * @return 下拉框键值映射表
-     */
-    Map<ColumnType, String> getMap();
+public interface ISelectMap<ColumnType> extends BaseMap<ColumnType, String> {
+
 }

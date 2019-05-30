@@ -3,6 +3,8 @@ package com.rxliuli.rxeasyexcel.annotation;
 
 import com.rxliuli.rxeasyexcel.domain.convert.IConverter;
 import com.rxliuli.rxeasyexcel.domain.convert.NotSpecifyConverter;
+import com.rxliuli.rxeasyexcel.domain.customize.CustomizeMap;
+import com.rxliuli.rxeasyexcel.domain.customize.DefaultCustomizeMap;
 import com.rxliuli.rxeasyexcel.domain.select.DefaultSelectMap;
 import com.rxliuli.rxeasyexcel.domain.select.ExcelColumnType;
 import com.rxliuli.rxeasyexcel.domain.select.ISelectMap;
@@ -78,5 +80,10 @@ public @interface ExcelField {
      * 值最大长度
      */
     int maxLength() default 500;
+
+    /**
+     * 自定义属性
+     */
+    Class<? extends CustomizeMap<?, ?>> customize() default DefaultCustomizeMap.class;
 
 }
