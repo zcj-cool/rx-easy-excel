@@ -5,6 +5,7 @@ import com.rxliuli.rxeasyexcel.domain.ExcelReadContext;
 import com.rxliuli.rxeasyexcel.domain.ExcelWriteContext;
 import com.rxliuli.rxeasyexcel.domain.ImportDomain;
 import com.rxliuli.rxeasyexcel.model.Car;
+import com.rxliuli.rxeasyexcel.model.SelectTest;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 
@@ -57,6 +58,19 @@ class ExcelWriteTest {
                         .clazz(Car.class)
                         .build());
         System.out.println(resolve);
+    }
+
+    @Test
+    void excelSelectTest() {
+        EasyExcel
+                .export(currentPath + "/ExcelSelectTest.xlsx")
+                .export(ExcelWriteContext.builder(true)
+                        .headers(SelectTest.class)
+                        .datasource(Lists.newArrayList(
+                                new SelectTest().setSelectVal(1)
+                        ))
+                        .build()
+                ).write();
     }
 
 }

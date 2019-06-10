@@ -82,7 +82,7 @@ public class ExcelBeanHelper {
                 .map(x -> {
                     final Tuple3<String, ? extends IConverter, ExcelField> triple = castHeaderNameAndConverter(x);
                     Class selectClass = getSelectClass(triple);
-                    return Tuple.of(x.getName(), ExcelWriterHeader.create(triple.getV1(), triple.getV2(), SelectMapFactory.get(selectClass), triple.getV3().type(), triple.getV3().prompt()));
+                    return Tuple.of(x.getName(), ExcelWriterHeader.create(triple.getV1(), triple.getV2(), SelectMapFactory.get(selectClass, context), triple.getV3().type(), triple.getV3().prompt()));
                 })
                 .collect(LinkedHashMap::new, (l, v) -> l.put(v.getV1(), v.getV2()), HashMap::putAll);
     }
