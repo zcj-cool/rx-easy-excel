@@ -64,9 +64,12 @@ class ExcelWriteTest {
     void excelSelectTest() {
         EasyExcel
                 .export(currentPath + "/ExcelSelectTest.xlsx")
-                .export(ExcelWriteContext.builder(true)
+                .export(ExcelWriteContext.builder(false)
                         .headers(SelectTest.class)
                         .datasource(Lists.newArrayList(
+                                new SelectTest().setSelectVal(1),
+                                new SelectTest().setSelectVal(1),
+                                new SelectTest().setSelectVal(1),
                                 new SelectTest().setSelectVal(1)
                         ))
                         .build()
