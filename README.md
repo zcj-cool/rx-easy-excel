@@ -25,7 +25,7 @@
 <dependency>
   <groupId>com.rxliuli</groupId>
   <artifactId>rx-easy-excel</artifactId>
-  <version>1.0.14</version>
+  <version>1.0.38</version>
 </dependency>
 ```
 
