@@ -21,10 +21,6 @@ public class DateConverter implements IConverter<Date> {
 
     @Override
     public Date from(String s) {
-        try {
-            return FAST_DATE_FORMAT.parse(s);
-        } catch (ParseException e) {
-            throw new ExcelException(e);
-        }
+        return new Date(Long.parseLong(s));
     }
 }
