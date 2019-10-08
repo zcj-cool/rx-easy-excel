@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.rxliuli</groupId>
     <artifactId>rx-easy-excel</artifactId>
-    <version>1.0.14</version>
+    <version>1.0.36</version>
     <packaging>jar</packaging>
     <developers>
         <developer>
@@ -31,6 +31,11 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <charset.UTF8>UTF-8</charset.UTF8>
+        <!-- 文件拷贝时的编码 -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- 编译时的编码 -->
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
     </properties>
     <dependencies>
         <dependency>

@@ -78,19 +78,25 @@ public class DefaultExcelWriter implements ExcelWriter {
         final LinkedList<Tuple2<String[], Integer>> selectTupleList = new LinkedList<>();
         // 绘图对象
         final Drawing<?> drawing = sheet.createDrawingPatriarch();
+        CellStyle headerStyle = getHeaderStyle();
         headers.forEach((k, v) -> {
             Cell cell = headerRow.createCell(tempCol.getAndIncrement());
             cell.setCellValue(v.getName());
             // 批注
             final String prompt = v.getPrompt();
             if (StringUtils.isNotEmpty(prompt)) {
-                final Comment comment = createComment(drawing, prompt, cell.getRowIndex(), cell.getColumnIndex());
+                final Comment comment = createComment(sheet, drawing, prompt, cell.getRowIndex(), cell.getColumnIndex());
                 cell.setCellComment(comment);
             }
             // 下拉框数据记录
             if (v.getType() == ExcelColumnType.SELECT) {
                 selectTupleList.push(Tuple.of(v.getSelectMap().values().toArray(new String[]{}), cell.getColumnIndex()));
             }
+            //设置宽度自适应
+            int columnIndex = cell.getColumnIndex();
+            ExcelBeanHelper.autoColumnWidth(sheet, columnIndex);
+            //设置表头样式
+            cell.setCellStyle(headerStyle);
         });
 
         // 下拉框设置
@@ -139,7 +145,7 @@ public class DefaultExcelWriter implements ExcelWriter {
             cell.setCellStyle(style);
             // 错误批注
             if (StringUtils.isNotEmpty(error.getMsg())) {
-                final Comment comment = createComment(drawing, error.getMsg(), cell.getRowIndex(), cell.getColumnIndex());
+                final Comment comment = createComment(sheet, drawing, error.getMsg(), cell.getRowIndex(), cell.getColumnIndex());
                 cell.setCellComment(comment);
             }
         });
@@ -147,16 +153,35 @@ public class DefaultExcelWriter implements ExcelWriter {
     }
 
     /**
+     * 获取表头样式
+     */
+    private CellStyle getHeaderStyle() {
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        cellStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        Font font = workbook.createFont();
+        font.setBold(true);
+        cellStyle.setFont(font);
+        return cellStyle;
+    }
+
+    /**
      * 获取一个单元格批注对象
-     *
+     * @param sheet
      * @param drawing 绘图对象
      * @param prompt  提示信息
      * @return 批注
      */
-    private Comment createComment(Drawing<?> drawing, String prompt, int row, int col) {
+    private Comment createComment(Sheet sheet, Drawing<?> drawing, String prompt, int row, int col) {
+        //计算内容使批注自适应
+        //获取列的宽度
+        int colWidth = sheet.getColumnWidth(col);
+        int length = colWidth * 2;
+        //行数
+        int rowNum = prompt.length() / length + 1;
         final Comment comment = drawing.createCellComment(this.excelType == ExcelType.XLSX
-                ? new XSSFClientAnchor(0, 0, 0, 0, col + 3, row + 3, col + 5, row + 8)
-                : new HSSFClientAnchor(0, 0, 0, 0, (short) (col + 3), row + 3, (short) (col + 5), row + 8)
+                ? new XSSFClientAnchor(0, 0, 0, 0, col + 3, row + 3, col + 5, row + 8 + rowNum)
+                : new HSSFClientAnchor(0, 0, 0, 0, (short) (col + 3), row + 3, (short) (col + 5), row + 8 + rowNum)
         );
         comment.setString(this.excelType == ExcelType.XLSX ? new XSSFRichTextString(prompt) : new HSSFRichTextString(prompt));
         return comment;
@@ -205,4 +230,5 @@ public class DefaultExcelWriter implements ExcelWriter {
             }
         }
     }
+
 }

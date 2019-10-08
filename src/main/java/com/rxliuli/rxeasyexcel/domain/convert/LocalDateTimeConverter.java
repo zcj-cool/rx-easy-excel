@@ -1,6 +1,7 @@
 package com.rxliuli.rxeasyexcel.domain.convert;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
@@ -22,13 +23,19 @@ public class LocalDateTimeConverter implements IConverter<LocalDateTime> {
                     .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
                     .toFormatter();
 
+    private static final DateTimeFormatter LOCAL_DATE_TIME_FORMATTER_EXCEL = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+
     @Override
     public String to(LocalDateTime localDateTime) {
-        return LOCAL_DATE_TIME_FORMATTER_FOR_SPACE_SEPARATED.format(localDateTime);
+        return LOCAL_DATE_TIME_FORMATTER_EXCEL.format(localDateTime);
     }
 
     @Override
     public LocalDateTime from(String s) {
-        return LocalDateTime.parse(s, LOCAL_DATE_TIME_FORMATTER_FOR_SPACE_SEPARATED);
+        try {
+            return LocalDateTime.ofEpochSecond(Long.valueOf(s) / 1000, 0, ZoneOffset.ofHours(8));
+        } catch (Exception e) {
+            return LocalDateTime.parse(s, LOCAL_DATE_TIME_FORMATTER_EXCEL);
+        }
     }
 }

@@ -7,6 +7,7 @@ import com.rxliuli.rxeasyexcel.domain.ExcelReadContext;
 import com.rxliuli.rxeasyexcel.domain.ExcelReadHeader;
 import com.rxliuli.rxeasyexcel.domain.ImportDomain;
 import com.rxliuli.rxeasyexcel.internal.util.ExcelBeanHelper;
+import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
@@ -17,10 +18,9 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Quding Ding
@@ -61,6 +61,18 @@ public class DefaultExcelReader implements ExcelReader {
         List<T> resultContainer = new ArrayList<>(totalCount);
         Map<String, ExcelReadHeader> configHeaders = context.getHeaders();
         final LinkedList<ExcelImportError> errorList = new LinkedList<>();
+        final LinkedMap<String, Integer> columnInfoMap = new LinkedMap<>();
+
+        //获取列信息
+        //添加列信息，只添加一次
+        final AtomicInteger colAddNum = new AtomicInteger(0);
+        header.cellIterator().forEachRemaining(x -> {
+            final int columnIndex = x.getColumnIndex();
+            final ExcelReadHeader tempHeader = configHeaders.get(realHeaders.get(columnIndex));
+            final Field field = tempHeader.getField();
+            columnInfoMap.put(field.getName(), columnIndex);
+            colAddNum.incrementAndGet();
+        });
 
         // 依次解析每一行
         for (; startRow <= lastRowNum; startRow++) {
@@ -82,13 +94,27 @@ public class DefaultExcelReader implements ExcelReader {
                     switch (tempHeader.getType()) {
                         case TEXT:
                             value = tempHeader.getConvert().from(columnValue);
+                            int maxLength = excelField.maxLength();
+                            if (Objects.toString(value).length() > maxLength) {
+                                errorList.add(new ExcelImportError(i, columnIndex, field.getName(), columnValue, null, "你输入的值超过" + maxLength + "字符，请重新输入"));
+                            }
                             break;
                         case SELECT:
                             value = tempHeader.getSelectMap().getOrDefault(columnValue, null);
+                            if (value == null || (value instanceof String && StringUtils.isEmpty((String) value))) {
+                                errorList.add(new ExcelImportError(i, columnIndex, field.getName(), columnValue, null, "请选择下拉框的值"));
+                            }
                             break;
                         default:
                             value = null;
                     }
+                } catch (NumberFormatException e) {
+                    final String msg = excelField.errMsg();
+                    errorList.add(new ExcelImportError(i, columnIndex, field.getName(), columnValue, e, StringUtils.isEmpty(msg) ? "请输入正确的数字" : msg));
+
+                } catch (DateTimeParseException e) {
+                    final String msg = excelField.errMsg();
+                    errorList.add(new ExcelImportError(i, columnIndex, field.getName(), columnValue, e, StringUtils.isEmpty(msg) ? "请输入正确的日期" : msg));
                 } catch (Exception e) {
                     // 如果解析错误则记录下来
                     final String msg = excelField.errMsg();
@@ -96,10 +122,9 @@ public class DefaultExcelReader implements ExcelReader {
                 }
                 ExcelBeanHelper.fieldSetValue(field, instance, value);
             });
-
             resultContainer.add(instance);
         }
-        return new ImportDomain<>(resultContainer, errorList);
+        return new ImportDomain<>(resultContainer, errorList, columnInfoMap);
     }
 
 

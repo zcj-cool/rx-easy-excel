@@ -13,6 +13,7 @@ public class ResponseHelper {
     public static OutputStream wrapper(HttpServletResponse resp, String fileName) {
         try {
             resp.setContentType("application/octet-stream");
+            resp.setContentType("application/x-excel");
             resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
             resp.setHeader("Content-Disposition", "attachment; filename=" + fileName);
             return resp.getOutputStream();

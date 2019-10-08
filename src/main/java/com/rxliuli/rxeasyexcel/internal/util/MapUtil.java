@@ -18,6 +18,6 @@ public class MapUtil {
      * @return 反转后的 Map 集合
      */
     public static <K, V> Map<V, K> reverse(Map<K, V> map) {
-        return map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+        return map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey, (a, b) -> a));
     }
 }

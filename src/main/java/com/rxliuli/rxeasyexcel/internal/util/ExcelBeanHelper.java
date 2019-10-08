@@ -13,9 +13,13 @@ import com.rxliuli.rxeasyexcel.domain.select.SelectMapFactory;
 import com.rxliuli.rxeasyexcel.internal.util.tuple.Tuple;
 import com.rxliuli.rxeasyexcel.internal.util.tuple.Tuple3;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Sheet;
 
 import java.lang.reflect.Field;
+import java.text.DecimalFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -78,7 +82,7 @@ public class ExcelBeanHelper {
                 .map(x -> {
                     final Tuple3<String, ? extends IConverter, ExcelField> triple = castHeaderNameAndConverter(x);
                     Class selectClass = getSelectClass(triple);
-                    return Tuple.of(x.getName(), ExcelWriterHeader.create(triple.getV1(), triple.getV2(), SelectMapFactory.get(selectClass), triple.getV3().type(), triple.getV3().prompt()));
+                    return Tuple.of(x.getName(), ExcelWriterHeader.create(triple.getV1(), triple.getV2(), SelectMapFactory.get(selectClass, context), triple.getV3().type(), triple.getV3().prompt()));
                 })
                 .collect(LinkedHashMap::new, (l, v) -> l.put(v.getV1(), v.getV2()), HashMap::putAll);
     }
@@ -202,12 +206,16 @@ public class ExcelBeanHelper {
             case BLANK:
                 return cell.getStringCellValue();
             case NUMERIC:
-                final double value = cell.getNumericCellValue();
-                Object res = value;
-                if (value == (int) value) {
-                    res = (int) value;
+                //判断是否日期
+                if (HSSFDateUtil.isCellDateFormatted(cell)) {
+                    Date date = HSSFDateUtil.getJavaDate(cell.getNumericCellValue());
+                    return Objects.toString(date.getTime());
                 }
-                return Objects.toString(res);
+//                Object res = value;
+//                if (value == (int) value) {
+//                    res = (int) value;
+//                }
+                return new DecimalFormat("#").format(cell.getNumericCellValue());
             case BOOLEAN:
                 return Objects.toString(cell.getBooleanCellValue());
             case _NONE:
@@ -238,4 +246,8 @@ public class ExcelBeanHelper {
                 .collect(HashMap::new, (l, v) -> l.put(v.getV1(), v.getV2()), HashMap::putAll);
     }
 
+    public static void autoColumnWidth(Sheet sheet, int columnIndex) {
+        sheet.autoSizeColumn(columnIndex);
+        sheet.setColumnWidth(columnIndex, sheet.getColumnWidth(columnIndex) * 17 / 10);
+    }
 }
