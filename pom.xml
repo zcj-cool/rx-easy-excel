@@ -24,7 +24,7 @@
         <commons-lang3.version>3.6</commons-lang3.version>
         <slf4j-api.version>1.7.25</slf4j-api.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
-        <logback-core.version>1.2.3</logback-core.version>
+        <logback-core.version>1.2.9</logback-core.version>
         <lombok.version>1.16.18</lombok.version>
         <rx-easy-test-spring-boot-starter.version>0.0.3</rx-easy-test-spring-boot-starter.version>
 
